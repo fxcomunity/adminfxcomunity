@@ -1,7 +1,7 @@
 backend:
   name: github
   # GANTI ini: username/nama-repo (contoh: neo/katalog-pdf)
-  repo: username/nama-repo
+  repo: fxcomunity/adminfxcomunity
   branch: main
 
 media_folder: "pdf"
