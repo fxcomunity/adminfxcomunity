@@ -5,7 +5,6 @@
   <title>Admin Katalog PDF</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-  <!-- Font (optional) -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
@@ -31,13 +30,7 @@
         radial-gradient(900px 500px at 90% 20%, #3b1f6e 0%, transparent 55%),
         linear-gradient(135deg, var(--bg1), var(--bg2));
     }
-    .wrap{
-      min-height:100vh;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      padding:28px;
-    }
+    .wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:28px}
     .card{
       width:min(520px,100%);
       border:1px solid var(--border);
@@ -66,13 +59,7 @@
     }
     h1{font-size:22px;font-weight:800;margin-bottom:6px;position:relative}
     p{color:var(--muted);font-size:14px;line-height:1.6;margin-bottom:18px;position:relative}
-    .actions{
-      display:flex;
-      gap:12px;
-      justify-content:center;
-      flex-wrap:wrap;
-      position:relative;
-    }
+    .actions{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;position:relative}
     .btn{
       border:1px solid var(--border);
       background: rgba(255,255,255,.06);
@@ -89,29 +76,15 @@
       user-select:none;
     }
     .btn:hover{transform:translateY(-1px); border-color: rgba(124,58,237,.5)}
-    .btn.primary{
-      background: linear-gradient(135deg, var(--primary), var(--primary2));
-      border-color: transparent;
-    }
-    .status{
-      margin-top:16px;
-      font-size:13px;
-      color:var(--muted);
-      display:flex;
-      justify-content:center;
-      align-items:center;
-      gap:8px;
-      position:relative;
-    }
+    .btn.primary{background: linear-gradient(135deg, var(--primary), var(--primary2)); border-color: transparent;}
+    .status{margin-top:16px;font-size:13px;color:var(--muted);display:flex;justify-content:center;align-items:center;gap:8px;position:relative}
     .dot{width:8px;height:8px;border-radius:999px;background:#f59e0b}
-
-    /* Saat CMS sudah kebuka, sembunyikan landing */
     body.cms-loaded .wrap{display:none}
   </style>
 
-  <!-- Netlify Identity (login) -->
+  <!-- ✅ Identity dulu -->
   <script defer src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
-  <!-- Netlify CMS -->
+  <!-- ✅ baru CMS -->
   <script defer src="https://unpkg.com/netlify-cms@^2.0.0/dist/netlify-cms.js"></script>
 </head>
 
