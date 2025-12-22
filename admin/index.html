@@ -21,6 +21,7 @@
       --shadow: 0 20px 60px rgba(0,0,0,.45);
     }
     *{box-sizing:border-box;margin:0;padding:0}
+
     body{
       min-height:100vh;
       font-family:"Plus Jakarta Sans",system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
@@ -30,7 +31,42 @@
         radial-gradient(900px 500px at 90% 20%, #3b1f6e 0%, transparent 55%),
         linear-gradient(135deg, var(--bg1), var(--bg2));
     }
-    .wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:28px}
+
+    /* ===== TOP MENU ===== */
+    .topbar{
+      position:fixed;
+      top:0; left:0; right:0;
+      height:64px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      padding:0 20px;
+      background:rgba(0,0,0,.35);
+      backdrop-filter: blur(10px);
+      border-bottom:1px solid var(--border);
+      z-index:10;
+    }
+    .topbar b{font-size:15px}
+    .topbar a{
+      text-decoration:none;
+      color:var(--text);
+      font-weight:800;
+      padding:8px 14px;
+      border-radius:12px;
+      border:1px solid var(--border);
+      background: rgba(255,255,255,.06);
+    }
+    .topbar a:hover{border-color: rgba(124,58,237,.5)}
+
+    /* ===== CONTENT ===== */
+    .wrap{
+      min-height:100vh;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:100px 28px 28px;
+    }
+
     .card{
       width:min(520px,100%);
       border:1px solid var(--border);
@@ -42,12 +78,14 @@
       position:relative;
       overflow:hidden;
     }
+
     .card::before{
       content:"";
       position:absolute; inset:-2px;
       background: radial-gradient(520px 240px at 20% 0%, rgba(124,58,237,.35), transparent 60%);
       pointer-events:none;
     }
+
     .logo{
       width:58px;height:58px;border-radius:18px;
       margin:0 auto 14px;
@@ -57,9 +95,17 @@
       font-size:24px;
       position:relative;
     }
-    h1{font-size:22px;font-weight:800;margin-bottom:6px;position:relative}
-    p{color:var(--muted);font-size:14px;line-height:1.6;margin-bottom:18px;position:relative}
-    .actions{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;position:relative}
+
+    h1{font-size:22px;font-weight:800;margin-bottom:6px}
+    p{color:var(--muted);font-size:14px;line-height:1.6;margin-bottom:18px}
+
+    .actions{
+      display:flex;
+      gap:12px;
+      justify-content:center;
+      flex-wrap:wrap;
+    }
+
     .btn{
       border:1px solid var(--border);
       background: rgba(255,255,255,.06);
@@ -73,22 +119,38 @@
       align-items:center;
       gap:10px;
       transition:.15s;
-      user-select:none;
     }
     .btn:hover{transform:translateY(-1px); border-color: rgba(124,58,237,.5)}
     .btn.primary{background: linear-gradient(135deg, var(--primary), var(--primary2)); border-color: transparent;}
-    .status{margin-top:16px;font-size:13px;color:var(--muted);display:flex;justify-content:center;align-items:center;gap:8px;position:relative}
+
+    .status{
+      margin-top:16px;
+      font-size:13px;
+      color:var(--muted);
+      display:flex;
+      justify-content:center;
+      align-items:center;
+      gap:8px;
+    }
     .dot{width:8px;height:8px;border-radius:999px;background:#f59e0b}
+
     body.cms-loaded .wrap{display:none}
   </style>
 
-  <!-- ✅ Identity dulu -->
+  <!-- Identity & CMS -->
   <script defer src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
-  <!-- ✅ baru CMS -->
   <script defer src="https://unpkg.com/netlify-cms@^2.0.0/dist/netlify-cms.js"></script>
 </head>
 
 <body>
+
+  <!-- TOP MENU -->
+  <div class="topbar">
+    <b>Admin Panel</b>
+    <a href="/">⬅ Kembali ke Beranda</a>
+  </div>
+
+  <!-- LOGIN CARD -->
   <div class="wrap">
     <div class="card">
       <div class="logo">🗂️</div>
@@ -97,7 +159,6 @@
 
       <div class="actions">
         <button class="btn primary" id="btnLogin" type="button">🔐 Login</button>
-        <a class="btn" href="../">⬅️ Kembali</a>
       </div>
 
       <div class="status" id="loginState">
