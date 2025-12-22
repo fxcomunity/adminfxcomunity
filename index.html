@@ -3,8 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Katalog Dokumen • FX Community</title>
-
+  <title>Katalog PDF</title>
   <link rel="stylesheet" href="assets/style.css" />
 </head>
 <body>
@@ -12,20 +11,12 @@
   <!-- Navbar -->
   <header class="nav">
     <div class="nav-left">
-      <span class="logo">📚 FX Community</span>
-      <span class="badge">Dokumen</span>
+      <span class="logo">📚 Katalog PDF</span>
+      <span class="badge">v1</span>
     </div>
 
     <div class="nav-right">
-      <button
-        id="toggleTheme"
-        class="btn ghost"
-        type="button"
-        title="Ganti tema"
-        aria-label="Ganti tema"
-      >
-        🌙
-      </button>
+      <button id="toggleTheme" class="btn ghost" type="button" title="Dark mode">🌙</button>
       <a class="btn primary" href="admin/">Admin</a>
     </div>
   </header>
@@ -33,56 +24,47 @@
   <!-- Hero -->
   <section class="hero">
     <div class="hero-inner">
-      <h1>Katalog Dokumen PDF</h1>
-      <p>
-        Kumpulan file PDF yang bisa kamu cari dan buka dengan cepat.
-        Semua dokumen tersedia dalam satu tempat.
-      </p>
+      <h1>Koleksi Dokumen PDF</h1>
+      <p>Cari, filter, dan buka dokumen dengan cepat.</p>
 
       <div class="controls">
-        <div class="input full">
+        <div class="input">
           <span class="icon">🔎</span>
-          <input
-            id="search"
-            type="search"
-            placeholder="Cari berdasarkan judul dokumen…"
-            autocomplete="off"
-          />
+          <input id="search" type="search" placeholder="Cari judul / deskripsi..." autocomplete="off" />
         </div>
+
+        <select id="category" class="select">
+          <option value="all">Semua Kategori</option>
+        </select>
+
+        <button id="toggleView" class="btn ghost" type="button" title="Ubah tampilan">⬛⬛</button>
       </div>
 
       <div class="meta">
         <span id="count">0 dokumen</span>
         <span class="dot">•</span>
-        <span>
-          Terakhir diperbarui:
-          <span id="updatedAt">-</span>
-        </span>
+        <span>Terakhir update: <span id="updatedAt">-</span></span>
       </div>
     </div>
   </section>
 
-  <!-- Main Content -->
+  <!-- Main -->
   <main class="container">
-    <h2 class="section-title">📂 Daftar Dokumen</h2>
+    <h2 class="section-title">📂 Daftar PDF</h2>
 
     <div id="list" class="grid"></div>
 
-    <!-- Empty State -->
     <div id="empty" class="empty hidden">
       <div class="empty-card">
         <div class="empty-icon">📭</div>
-        <div class="empty-title">Dokumen tidak ditemukan</div>
-        <div class="empty-sub">
-          Coba gunakan kata kunci lain atau periksa ejaannya.
-        </div>
+        <div class="empty-title">Tidak ada hasil</div>
+        <div class="empty-sub">Coba ubah kata kunci atau kategori.</div>
       </div>
     </div>
   </main>
 
-  <!-- Footer -->
   <footer class="footer">
-    © <span id="year"></span> FX Community · Val
+    © <span id="year"></span> Katalog PDF · Dibuat dengan ❤️
   </footer>
 
   <script src="assets/app.js"></script>
