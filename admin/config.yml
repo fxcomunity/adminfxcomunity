@@ -2,22 +2,32 @@ backend:
   name: git-gateway
   branch: main
 
+# Lokasi file upload (PDF)
 media_folder: "pdf"
 public_folder: "/pdf"
 
+# Tampilan editor CMS
+publish_mode: simple
+locale: "id"
+
 collections:
-  - name: "pdfs"
+  - name: "katalog"
     label: "Katalog PDF"
     files:
-      - name: "data"
+      - name: "data_pdf"
         label: "Data PDF"
         file: "data/pdfs.json"
+        format: "json"
         fields:
-          - { label: "Terakhir Update", name: "updated_at", widget: "datetime" }
           - label: "Daftar PDF"
             name: "items"
             widget: "list"
+            summary: "{{fields.title}}"
             fields:
-              - { label: "Judul", name: "title", widget: "string" }
-              - { label: "Tanggal", name: "updated_at", widget: "datetime" }
-              - { label: "File PDF", name: "url", widget: "file" }
+              - label: "Judul"
+                name: "title"
+                widget: "string"
+
+              - label: "File PDF"
+                name: "url"
+                widget: "file"
