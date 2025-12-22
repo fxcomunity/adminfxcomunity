@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Katalog PDF</title>
+  <title>Katalog Dokumen</title>
   <link rel="stylesheet" href="assets/style.css" />
 </head>
 <body>
@@ -11,12 +11,12 @@
   <!-- Navbar -->
   <header class="nav">
     <div class="nav-left">
-      <span class="logo">📚 Katalog PDF</span>
+      <span class="logo">📚 Katalog Dokumen</span>
       <span class="badge">v1</span>
     </div>
 
     <div class="nav-right">
-      <button id="toggleTheme" class="btn ghost" type="button" title="Dark mode">🌙</button>
+      <button id="toggleTheme" class="btn ghost" type="button" title="Ganti tema">🌙</button>
       <a class="btn primary" href="admin/">Admin</a>
     </div>
   </header>
@@ -24,26 +24,25 @@
   <!-- Hero -->
   <section class="hero">
     <div class="hero-inner">
-      <h1>Koleksi Dokumen PDF</h1>
-      <p>Cari, filter, dan buka dokumen dengan cepat.</p>
+      <h1>Kumpulan Dokumen PDF</h1>
+      <p>Cari dan buka dokumen dengan cepat tanpa ribet.</p>
 
       <div class="controls">
-        <div class="input">
+        <div class="input full">
           <span class="icon">🔎</span>
-          <input id="search" type="search" placeholder="Cari judul / deskripsi..." autocomplete="off" />
+          <input
+            id="search"
+            type="search"
+            placeholder="Cari judul atau deskripsi dokumen…"
+            autocomplete="off"
+          />
         </div>
-
-        <select id="category" class="select">
-          <option value="all">Semua Kategori</option>
-        </select>
-
-        <button id="toggleView" class="btn ghost" type="button" title="Ubah tampilan">⬛⬛</button>
       </div>
 
       <div class="meta">
         <span id="count">0 dokumen</span>
         <span class="dot">•</span>
-        <span>Terakhir update: <span id="updatedAt">-</span></span>
+        <span>Update terakhir: <span id="updatedAt">-</span></span>
       </div>
     </div>
   </section>
@@ -57,14 +56,14 @@
     <div id="empty" class="empty hidden">
       <div class="empty-card">
         <div class="empty-icon">📭</div>
-        <div class="empty-title">Tidak ada hasil</div>
-        <div class="empty-sub">Coba ubah kata kunci atau kategori.</div>
+        <div class="empty-title">Dokumen tidak ditemukan</div>
+        <div class="empty-sub">Coba gunakan kata kunci lain.</div>
       </div>
     </div>
   </main>
 
   <footer class="footer">
-    © <span id="year"></span> Katalog PDF · Dibuat dengan ❤️
+    © <span id="year"></span> FX COMUNITY · 陈嘉杰 | Val
   </footer>
 
   <script src="assets/app.js"></script>
