@@ -1,7 +1,5 @@
 backend:
-  name: github
-  # GANTI ini: username/nama-repo (contoh: neo/katalog-pdf)
-  repo: fxcomunity/adminfxcomunity
+  name: git-gateway
   branch: main
 
 media_folder: "pdf"
@@ -21,7 +19,5 @@ collections:
             widget: "list"
             fields:
               - { label: "Judul", name: "title", widget: "string" }
-              - { label: "Deskripsi", name: "desc", widget: "text" }
-              - { label: "Kategori", name: "category", widget: "string" }
+              - { label: "Tanggal", name: "updated_at", widget: "datetime" }
               - { label: "File PDF", name: "url", widget: "file" }
-              - { label: "Tanggal Update", name: "updated_at", widget: "datetime" }
