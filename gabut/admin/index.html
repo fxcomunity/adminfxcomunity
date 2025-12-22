@@ -1,0 +1,187 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8" />
+  <title>Admin Katalog PDF</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- Font -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
+
+  <style>
+    :root{
+      --bg1:#0b1220;
+      --bg2:#151a33;
+      --border: rgba(255,255,255,.14);
+      --text: #e5e7eb;
+      --muted:#a1a1aa;
+      --primary:#7c3aed;
+      --primary2:#6d28d9;
+      --shadow: 0 20px 60px rgba(0,0,0,.45);
+    }
+
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{
+      min-height:100vh;
+      font-family:"Plus Jakarta Sans",system-ui,sans-serif;
+      color:var(--text);
+      background:
+        radial-gradient(1000px 600px at 10% 10%, #2b2f66 0%, transparent 60%),
+        radial-gradient(900px 500px at 90% 20%, #3b1f6e 0%, transparent 55%),
+        linear-gradient(135deg, var(--bg1), var(--bg2));
+    }
+
+    .wrap{
+      min-height:100vh;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:28px;
+    }
+
+    .panel{
+      width:min(520px,100%);
+      border:1px solid var(--border);
+      background: linear-gradient(180deg, rgba(255,255,255,.09), rgba(255,255,255,.05));
+      border-radius:26px;
+      box-shadow: var(--shadow);
+      padding:28px;
+      text-align:center;
+    }
+
+    .logo{
+      width:56px;height:56px;
+      border-radius:18px;
+      margin:0 auto 14px;
+      display:grid;place-items:center;
+      background: rgba(124,58,237,.25);
+      border:1px solid rgba(124,58,237,.35);
+      font-size:24px;
+    }
+
+    h1{
+      font-size:22px;
+      font-weight:800;
+      margin-bottom:6px;
+    }
+
+    p{
+      color:var(--muted);
+      font-size:14px;
+      line-height:1.6;
+      margin-bottom:18px;
+    }
+
+    .actions{
+      display:flex;
+      gap:12px;
+      justify-content:center;
+      flex-wrap:wrap;
+    }
+
+    .btn{
+      border:1px solid var(--border);
+      background: rgba(255,255,255,.06);
+      color:var(--text);
+      padding:12px 18px;
+      border-radius:16px;
+      cursor:pointer;
+      font-weight:700;
+      text-decoration:none;
+      display:inline-flex;
+      align-items:center;
+      gap:10px;
+      transition:.15s;
+    }
+
+    .btn:hover{
+      transform:translateY(-1px);
+      border-color: rgba(124,58,237,.5);
+    }
+
+    .btn.primary{
+      background: linear-gradient(135deg, var(--primary), var(--primary2));
+      border-color:transparent;
+    }
+
+    .status{
+      margin-top:16px;
+      font-size:13px;
+      color:var(--muted);
+      display:flex;
+      justify-content:center;
+      align-items:center;
+      gap:8px;
+    }
+
+    .dot{
+      width:8px;height:8px;
+      border-radius:999px;
+      background:#f59e0b;
+    }
+
+    body.cms-loaded .wrap{display:none}
+  </style>
+
+  <!-- Netlify Identity -->
+  <script defer src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
+  <!-- Netlify CMS -->
+  <script defer src="https://unpkg.com/netlify-cms@^2.0.0/dist/netlify-cms.js"></script>
+</head>
+
+<body>
+  <div class="wrap">
+    <div class="panel">
+      <div class="logo">🗂️</div>
+      <h1>Admin Katalog PDF</h1>
+      <p>Login untuk mengelola dokumen PDF kamu.</p>
+
+      <div class="actions">
+        <button class="btn primary" id="btnLogin">🔐 Login Admin</button>
+        <a class="btn" href="../">⬅️ Kembali</a>
+      </div>
+
+      <div class="status" id="loginState">
+        <span class="dot"></span>
+        <span>Belum login</span>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    window.addEventListener("load", () => {
+      const btn = document.getElementById("btnLogin");
+      const state = document.getElementById("loginState");
+      const dot = state.querySelector(".dot");
+      const text = state.querySelector("span:last-child");
+
+      function setState(logged){
+        dot.style.background = logged ? "#22c55e" : "#f59e0b";
+        text.textContent = logged ? "Sudah login" : "Belum login";
+      }
+
+      if (window.netlifyIdentity) {
+        btn.onclick = () => window.netlifyIdentity.open();
+
+        window.netlifyIdentity.on("init", user => {
+          setState(!!user);
+          if (user) document.body.classList.add("cms-loaded");
+        });
+
+        window.netlifyIdentity.on("login", () => {
+          setState(true);
+          document.body.classList.add("cms-loaded");
+          window.netlifyIdentity.close();
+        });
+
+        window.netlifyIdentity.init();
+      } else {
+        btn.disabled = true;
+        btn.textContent = "Identity belum aktif";
+      }
+    });
+  </script>
+</body>
+</html>
