@@ -2,7 +2,7 @@
 <html lang="id">
 <head>
   <meta charset="utf-8" />
-  <title>Admin Katalog PDF</title>
+  <title>Admin • Kelola PDF</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -32,39 +32,35 @@
         linear-gradient(135deg, var(--bg1), var(--bg2));
     }
 
-    /* ===== TOP MENU ===== */
-    .topbar{
+    /* tombol kembali (muncul di CMS) */
+    .back-home{
       position:fixed;
-      top:0; left:0; right:0;
-      height:64px;
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      padding:0 20px;
-      background:rgba(0,0,0,.35);
-      backdrop-filter: blur(10px);
-      border-bottom:1px solid var(--border);
-      z-index:10;
+      top:14px;
+      left:14px;
+      z-index:99999;
+      display:none;
     }
-    .topbar b{font-size:15px}
-    .topbar a{
+    .back-home a{
       text-decoration:none;
-      color:var(--text);
-      font-weight:800;
-      padding:8px 14px;
+      padding:10px 14px;
       border-radius:12px;
-      border:1px solid var(--border);
-      background: rgba(255,255,255,.06);
+      background:#0b1220;
+      color:#fff;
+      font-weight:800;
+      border:1px solid rgba(255,255,255,.2);
+      box-shadow:0 10px 30px rgba(0,0,0,.45);
     }
-    .topbar a:hover{border-color: rgba(124,58,237,.5)}
+    .back-home a:hover{background:#7c3aed}
 
-    /* ===== CONTENT ===== */
+    body.cms-loaded .back-home{display:block}
+    body.cms-loaded .wrap{display:none}
+
     .wrap{
       min-height:100vh;
       display:flex;
       align-items:center;
       justify-content:center;
-      padding:100px 28px 28px;
+      padding:28px;
     }
 
     .card{
@@ -93,35 +89,38 @@
       background: rgba(124,58,237,.25);
       border:1px solid rgba(124,58,237,.35);
       font-size:24px;
-      position:relative;
     }
 
-    h1{font-size:22px;font-weight:800;margin-bottom:6px}
-    p{color:var(--muted);font-size:14px;line-height:1.6;margin-bottom:18px}
+    h1{
+      font-size:22px;
+      font-weight:800;
+      margin-bottom:6px;
+    }
+
+    p{
+      color:var(--muted);
+      font-size:14px;
+      line-height:1.6;
+      margin-bottom:18px;
+    }
 
     .actions{
       display:flex;
-      gap:12px;
       justify-content:center;
-      flex-wrap:wrap;
     }
 
     .btn{
       border:1px solid var(--border);
-      background: rgba(255,255,255,.06);
-      color:var(--text);
-      padding:12px 18px;
+      background: linear-gradient(135deg, var(--primary), var(--primary2));
+      color:#fff;
+      padding:12px 20px;
       border-radius:16px;
       cursor:pointer;
       font-weight:800;
       text-decoration:none;
-      display:inline-flex;
-      align-items:center;
-      gap:10px;
       transition:.15s;
     }
-    .btn:hover{transform:translateY(-1px); border-color: rgba(124,58,237,.5)}
-    .btn.primary{background: linear-gradient(135deg, var(--primary), var(--primary2)); border-color: transparent;}
+    .btn:hover{filter:brightness(1.05)}
 
     .status{
       margin-top:16px;
@@ -132,38 +131,47 @@
       align-items:center;
       gap:8px;
     }
-    .dot{width:8px;height:8px;border-radius:999px;background:#f59e0b}
 
-    body.cms-loaded .wrap{display:none}
+    .dot{
+      width:8px;
+      height:8px;
+      border-radius:999px;
+      background:#f59e0b;
+    }
   </style>
 
-  <!-- Identity & CMS -->
+  <!-- Netlify Identity & CMS -->
   <script defer src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
   <script defer src="https://unpkg.com/netlify-cms@^2.0.0/dist/netlify-cms.js"></script>
 </head>
 
 <body>
 
-  <!-- TOP MENU -->
-  <div class="topbar">
-    <b>Admin Panel</b>
+  <!-- Kembali ke beranda (muncul saat CMS aktif) -->
+  <div class="back-home">
     <a href="/">⬅ Kembali ke Beranda</a>
   </div>
 
-  <!-- LOGIN CARD -->
+  <!-- Halaman login -->
   <div class="wrap">
     <div class="card">
-      <div class="logo">🗂️</div>
-      <h1>Admin Katalog PDF</h1>
-      <p>Login untuk mengelola dokumen PDF kamu.</p>
+      <div class="logo">📁</div>
+
+      <h1>Kelola Dokumen PDF</h1>
+      <p>
+        Halaman ini dipakai untuk mengatur file PDF yang tampil di website.
+        Kamu bisa menambah, mengubah, atau menghapus data kapan saja.
+      </p>
 
       <div class="actions">
-        <button class="btn primary" id="btnLogin" type="button">🔐 Login</button>
+        <button class="btn" id="btnLogin" type="button">
+          Masuk sebagai Admin
+        </button>
       </div>
 
       <div class="status" id="loginState">
         <span class="dot"></span>
-        <span>Belum login</span>
+        <span>Status: belum masuk</span>
       </div>
     </div>
   </div>
@@ -177,16 +185,20 @@
 
       function setState(logged){
         dot.style.background = logged ? "#22c55e" : "#f59e0b";
-        text.textContent = logged ? "Sudah login" : "Belum login";
+        text.textContent = logged
+          ? "Status: sudah masuk"
+          : "Status: belum masuk";
       }
 
       if (!window.netlifyIdentity) {
         btn.disabled = true;
-        btn.textContent = "Identity belum aktif";
+        btn.textContent = "Login belum tersedia";
         return;
       }
 
-      btn.addEventListener("click", () => window.netlifyIdentity.open());
+      btn.addEventListener("click", () => {
+        window.netlifyIdentity.open();
+      });
 
       window.netlifyIdentity.on("init", user => {
         setState(!!user);
@@ -207,5 +219,6 @@
       window.netlifyIdentity.init();
     });
   </script>
+
 </body>
 </html>
