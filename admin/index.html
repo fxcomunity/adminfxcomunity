@@ -2,8 +2,8 @@
 <html lang="id">
 <head>
   <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Admin • Kelola PDF</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -11,214 +11,478 @@
 
   <style>
     :root{
-      --bg1:#0b1220;
-      --bg2:#151a33;
-      --border: rgba(255,255,255,.14);
-      --text: #e5e7eb;
-      --muted:#a1a1aa;
-      --primary:#7c3aed;
-      --primary2:#6d28d9;
+      --bg1:#0b1220; --bg2:#151a33;
+      --border: rgba(255,255,255,.12);
+      --text:#e5e7eb; --muted:#a1a1aa;
+      --primary:#7c3aed; --primary2:#6d28d9;
       --shadow: 0 20px 60px rgba(0,0,0,.45);
+      --ok:#22c55e; --warn:#f59e0b; --bad:#ef4444;
     }
     *{box-sizing:border-box;margin:0;padding:0}
-
     body{
-      min-height:100vh;
       font-family:"Plus Jakarta Sans",system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
       color:var(--text);
+      min-height:100vh;
       background:
         radial-gradient(1000px 600px at 10% 10%, #2b2f66 0%, transparent 60%),
         radial-gradient(900px 500px at 90% 20%, #3b1f6e 0%, transparent 55%),
         linear-gradient(135deg, var(--bg1), var(--bg2));
     }
 
-    /* tombol kembali (muncul di CMS) */
-    .back-home{
-      position:fixed;
-      top:14px;
-      left:14px;
-      z-index:99999;
-      display:none;
+    .topbar{
+      position:sticky; top:0; z-index:10;
+      display:flex; align-items:center; justify-content:space-between;
+      padding:14px 18px;
+      background: rgba(0,0,0,.35);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--border);
     }
-    .back-home a{
-      text-decoration:none;
-      padding:10px 14px;
-      border-radius:12px;
-      background:#0b1220;
-      color:#fff;
-      font-weight:800;
-      border:1px solid rgba(255,255,255,.2);
-      box-shadow:0 10px 30px rgba(0,0,0,.45);
-    }
-    .back-home a:hover{background:#7c3aed}
-
-    body.cms-loaded .back-home{display:block}
-    body.cms-loaded .wrap{display:none}
-
-    .wrap{
-      min-height:100vh;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      padding:28px;
-    }
-
-    .card{
-      width:min(520px,100%);
-      border:1px solid var(--border);
-      background: linear-gradient(180deg, rgba(255,255,255,.09), rgba(255,255,255,.05));
-      border-radius:26px;
-      box-shadow: var(--shadow);
-      padding:28px;
-      text-align:center;
-      position:relative;
-      overflow:hidden;
-    }
-
-    .card::before{
-      content:"";
-      position:absolute; inset:-2px;
-      background: radial-gradient(520px 240px at 20% 0%, rgba(124,58,237,.35), transparent 60%);
-      pointer-events:none;
-    }
-
-    .logo{
-      width:58px;height:58px;border-radius:18px;
-      margin:0 auto 14px;
+    .brand{display:flex; gap:10px; align-items:center}
+    .badge{
+      width:38px;height:38px;border-radius:14px;
       display:grid;place-items:center;
-      background: rgba(124,58,237,.25);
+      background: rgba(124,58,237,.22);
       border:1px solid rgba(124,58,237,.35);
-      font-size:24px;
+      font-size:18px;
     }
+    .brand b{font-size:15px}
+    .brand span{display:block; font-size:12px; color:var(--muted); margin-top:2px}
 
-    h1{
-      font-size:22px;
-      font-weight:800;
-      margin-bottom:6px;
-    }
-
-    p{
-      color:var(--muted);
-      font-size:14px;
-      line-height:1.6;
-      margin-bottom:18px;
-    }
-
-    .actions{
-      display:flex;
-      justify-content:center;
-    }
-
+    .top-actions{display:flex; gap:10px; flex-wrap:wrap; align-items:center; justify-content:flex-end}
     .btn{
       border:1px solid var(--border);
-      background: linear-gradient(135deg, var(--primary), var(--primary2));
-      color:#fff;
-      padding:12px 20px;
-      border-radius:16px;
+      background: rgba(255,255,255,.06);
+      color:var(--text);
+      padding:10px 12px;
+      border-radius:14px;
       cursor:pointer;
       font-weight:800;
       text-decoration:none;
-      transition:.15s;
-    }
-    .btn:hover{filter:brightness(1.05)}
-
-    .status{
-      margin-top:16px;
-      font-size:13px;
-      color:var(--muted);
-      display:flex;
-      justify-content:center;
+      display:inline-flex;
       align-items:center;
       gap:8px;
+      transition:.15s;
+      user-select:none;
+    }
+    .btn:hover{transform: translateY(-1px); border-color: rgba(124,58,237,.5)}
+    .btn.primary{background: linear-gradient(135deg,var(--primary),var(--primary2)); border-color:transparent}
+    .btn.danger{background: rgba(239,68,68,.15); border-color: rgba(239,68,68,.25)}
+    .btn:disabled{opacity:.55; cursor:not-allowed; transform:none}
+
+    .wrap{max-width:1100px; margin:0 auto; padding:18px}
+    .grid{display:grid; grid-template-columns: 1.2fr .8fr; gap:14px}
+    @media (max-width: 980px){ .grid{grid-template-columns:1fr} }
+
+    .panel{
+      background: linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.05));
+      border:1px solid var(--border);
+      border-radius:22px;
+      box-shadow: var(--shadow);
+      overflow:hidden;
+    }
+    .panel h2{
+      padding:16px 16px 10px;
+      font-size:15px;
+      font-weight:900;
+      border-bottom:1px solid rgba(255,255,255,.10);
+    }
+    .panel .body{padding:14px 16px 16px}
+
+    .row{display:grid; gap:10px}
+    .field label{font-size:12px; color:var(--muted); display:block; margin-bottom:6px}
+    .field input, .field textarea{
+      width:100%;
+      padding:11px 12px;
+      border-radius:14px;
+      border:1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.06);
+      color:var(--text);
+      outline:none;
     }
 
-    .dot{
-      width:8px;
-      height:8px;
-      border-radius:999px;
-      background:#f59e0b;
+    .hint{font-size:12px; color:var(--muted); line-height:1.5}
+
+    .list{display:grid; gap:10px}
+    .item{
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.06);
+      border-radius:16px;
+      padding:12px 12px;
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:10px;
     }
+    .item .meta b{display:block; font-size:14px; margin-bottom:4px}
+    .item .meta small{color:var(--muted); word-break: break-all}
+
+    .pill{
+      display:inline-flex; align-items:center; gap:8px;
+      padding:7px 10px; border-radius:999px;
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.06);
+      font-size:12px; color:var(--muted);
+    }
+    .pill i{width:8px;height:8px;border-radius:999px; background: var(--warn); display:inline-block}
+
+    .toolbar{
+      display:flex; gap:10px; flex-wrap:wrap; align-items:center;
+      padding:12px 16px;
+      border-bottom:1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.03);
+    }
+    .toolbar input{
+      flex:1;
+      padding:10px 12px;
+      border-radius:14px;
+      border:1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.06);
+      color:var(--text);
+      outline:none;
+      min-width:220px;
+    }
+
+    .modal{
+      position:fixed; inset:0;
+      background: rgba(0,0,0,.55);
+      display:none;
+      align-items:center;
+      justify-content:center;
+      padding:18px;
+      z-index:50;
+    }
+    .modal.show{display:flex}
+    .modal .box{
+      width:min(640px,100%);
+      border-radius:22px;
+      border:1px solid rgba(255,255,255,.14);
+      background: #0f1730;
+      box-shadow: var(--shadow);
+      overflow:hidden;
+    }
+    .modal .head{
+      padding:14px 16px;
+      display:flex; justify-content:space-between; align-items:center;
+      border-bottom:1px solid rgba(255,255,255,.10);
+    }
+    .modal .head b{font-size:14px}
+    .modal .content{padding:14px 16px 16px}
+    .modal .foot{
+      padding:14px 16px;
+      display:flex; gap:10px; justify-content:flex-end;
+      border-top:1px solid rgba(255,255,255,.10)
+    }
+    .x{background:transparent;border:0;color:var(--muted);cursor:pointer;font-size:22px;line-height:1}
   </style>
 
-  <!-- Netlify Identity & CMS -->
-  <script defer src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
-  <script src="https://unpkg.com/decap-cms@^3.0.0/dist/decap-cms.js"></script>
+  <!-- JSZip (buat download ZIP) -->
+  <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
 </head>
 
 <body>
+  <div class="topbar">
+    <div class="brand">
+      <div class="badge">📁</div>
+      <div>
+        <b>Admin • Kelola PDF</b>
+        <span>Edit data → download ZIP → upload ke GitHub</span>
+      </div>
+    </div>
 
-  <!-- Kembali ke beranda (muncul saat CMS aktif) -->
-  <div class="back-home">
-    <a href="/">⬅ Kembali ke Beranda</a>
+    <div class="top-actions">
+      <a class="btn" href="/">⬅ Beranda</a>
+      <button class="btn" id="btnReload">↻ Muat Data</button>
+      <button class="btn primary" id="btnDownloadZip">⬇ Download ZIP Update</button>
+    </div>
   </div>
 
-  <!-- Halaman login -->
   <div class="wrap">
-    <div class="card">
-      <div class="logo">📁</div>
+    <div class="grid">
+      <!-- LIST -->
+      <div class="panel">
+        <div class="toolbar">
+          <input id="q" type="search" placeholder="Cari judul…" />
+          <span class="pill" id="pillState"><i></i><span>Belum ada perubahan</span></span>
+        </div>
 
-      <h1>Kelola Dokumen PDF</h1>
-      <p>
-        Halaman ini dipakai untuk mengatur file PDF yang tampil di website.
-        Kamu bisa menambah, mengubah, atau menghapus data kapan saja.
-      </p>
-
-      <div class="actions">
-        <button class="btn" id="btnLogin" type="button">
-          Masuk sebagai Admin
-        </button>
+        <h2>Daftar PDF</h2>
+        <div class="body">
+          <div class="list" id="list"></div>
+          <p class="hint" style="margin-top:10px">
+            Perubahan di sini belum otomatis masuk ke Netlify (karena hosting statis).
+            Setelah selesai, klik <b>Download ZIP Update</b> lalu upload isi ZIP ke repo GitHub.
+          </p>
+        </div>
       </div>
 
-      <div class="status" id="loginState">
-        <span class="dot"></span>
-        <span>Status: belum masuk</span>
+      <!-- FORM TAMBAH -->
+      <div class="panel">
+        <h2>Tambah PDF</h2>
+        <div class="body">
+          <div class="row">
+            <div class="field">
+              <label>Judul</label>
+              <input id="inTitle" type="text" placeholder="Misal: Proposal 2025" />
+            </div>
+
+            <div class="field">
+              <label>File PDF (opsional)</label>
+              <input id="inFile" type="file" accept="application/pdf" />
+              <p class="hint" style="margin-top:6px">
+                File akan dimasukkan ke folder <b>/pdf</b> saat kamu download ZIP.
+              </p>
+            </div>
+
+            <button class="btn primary" id="btnAdd">+ Tambah ke daftar</button>
+
+            <p class="hint">
+              Kalau kamu nggak upload file, nanti bisa isi URL manual via tombol <b>Edit</b>.
+              Contoh URL: <b>pdf/nama.pdf</b> atau link <b>https://…</b>
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL EDIT -->
+  <div class="modal" id="modal">
+    <div class="box">
+      <div class="head">
+        <b>Edit item</b>
+        <button class="x" id="btnClose" aria-label="Close">×</button>
+      </div>
+      <div class="content">
+        <div class="row">
+          <div class="field">
+            <label>Judul</label>
+            <input id="edTitle" type="text" />
+          </div>
+          <div class="field">
+            <label>URL (contoh: pdf/nama.pdf atau link https://…)</label>
+            <input id="edUrl" type="text" />
+          </div>
+          <p class="hint">Kalau file ada di repo, formatnya biasanya: <b>pdf/nama-file.pdf</b>.</p>
+        </div>
+      </div>
+      <div class="foot">
+        <button class="btn danger" id="btnDelete">Hapus</button>
+        <button class="btn" id="btnSave">Simpan</button>
       </div>
     </div>
   </div>
 
   <script>
-    window.addEventListener("load", () => {
-      const btn = document.getElementById("btnLogin");
-      const state = document.getElementById("loginState");
-      const dot = state.querySelector(".dot");
-      const text = state.querySelector("span:last-child");
+    // ====== STATE ======
+    let data = { items: [] };
+    let dirty = false;
+    const stagedFiles = new Map(); // filename -> File
+    let editingIndex = -1;
 
-      function setState(logged){
-        dot.style.background = logged ? "#22c55e" : "#f59e0b";
-        text.textContent = logged
-          ? "Status: sudah masuk"
-          : "Status: belum masuk";
+    // ====== DOM ======
+    const listEl = document.getElementById("list");
+    const qEl = document.getElementById("q");
+    const pill = document.getElementById("pillState");
+    const pillDot = pill.querySelector("i");
+    const pillText = pill.querySelector("span");
+
+    const inTitle = document.getElementById("inTitle");
+    const inFile = document.getElementById("inFile");
+    const btnAdd = document.getElementById("btnAdd");
+    const btnReload = document.getElementById("btnReload");
+    const btnDownloadZip = document.getElementById("btnDownloadZip");
+
+    const modal = document.getElementById("modal");
+    const btnClose = document.getElementById("btnClose");
+    const edTitle = document.getElementById("edTitle");
+    const edUrl = document.getElementById("edUrl");
+    const btnSave = document.getElementById("btnSave");
+    const btnDelete = document.getElementById("btnDelete");
+
+    // ====== HELPERS ======
+    function setDirty(v){
+      dirty = v;
+      if (dirty){
+        pillDot.style.background = "var(--warn)";
+        pillText.textContent = "Ada perubahan (belum diunduh)";
+      } else {
+        pillDot.style.background = "var(--ok)";
+        pillText.textContent = "Belum ada perubahan";
       }
+    }
 
-      if (!window.netlifyIdentity) {
-        btn.disabled = true;
-        btn.textContent = "Login belum tersedia";
+    function safeName(name){
+      return (name || "file.pdf")
+        .trim()
+        .replace(/\s+/g, "-")
+        .replace(/[^a-zA-Z0-9._-]/g, "")
+        .replace(/-+/g, "-");
+    }
+
+    function render(){
+      const q = (qEl.value || "").toLowerCase().trim();
+      const items = (data.items || []).filter(it =>
+        (it.title || "").toLowerCase().includes(q)
+      );
+
+      listEl.innerHTML = "";
+      if (!items.length){
+        const p = document.createElement("p");
+        p.className = "hint";
+        p.textContent = q ? "Nggak ketemu. Coba kata kunci lain." : "Belum ada data. Tambah item di panel kanan.";
+        listEl.appendChild(p);
         return;
       }
 
-      btn.addEventListener("click", () => {
-        window.netlifyIdentity.open();
-      });
+      items.forEach((it) => {
+        const idx = data.items.indexOf(it);
 
-      window.netlifyIdentity.on("init", user => {
-        setState(!!user);
-        if (user) document.body.classList.add("cms-loaded");
-      });
+        const row = document.createElement("div");
+        row.className = "item";
 
-      window.netlifyIdentity.on("login", () => {
-        setState(true);
-        document.body.classList.add("cms-loaded");
-        window.netlifyIdentity.close();
-      });
+        const left = document.createElement("div");
+        left.className = "meta";
+        left.innerHTML = `
+          <b>${it.title || "Tanpa judul"}</b>
+          <small>${it.url ? it.url : "<i>(belum ada URL)</i>"}</small>
+        `;
 
-      window.netlifyIdentity.on("logout", () => {
-        setState(false);
-        document.body.classList.remove("cms-loaded");
-      });
+        const right = document.createElement("div");
+        right.style.display = "flex";
+        right.style.gap = "8px";
+        right.style.alignItems = "center";
 
-      window.netlifyIdentity.init();
+        const open = document.createElement("a");
+        open.className = "btn";
+        open.href = it.url || "#";
+        open.target = "_blank";
+        open.rel = "noopener";
+        open.textContent = "Buka";
+        open.style.padding = "8px 10px";
+        open.style.borderRadius = "12px";
+        if (!it.url) {
+          open.style.opacity = ".5";
+          open.style.pointerEvents = "none";
+        }
+
+        const edit = document.createElement("button");
+        edit.className = "btn";
+        edit.textContent = "Edit";
+        edit.style.padding = "8px 10px";
+        edit.style.borderRadius = "12px";
+        edit.addEventListener("click", () => openEdit(idx));
+
+        right.appendChild(open);
+        right.appendChild(edit);
+
+        row.appendChild(left);
+        row.appendChild(right);
+        listEl.appendChild(row);
+      });
+    }
+
+    function openEdit(idx){
+      editingIndex = idx;
+      const it = data.items[idx];
+      edTitle.value = it.title || "";
+      edUrl.value = it.url || "";
+      modal.classList.add("show");
+    }
+
+    function closeEdit(){
+      modal.classList.remove("show");
+      editingIndex = -1;
+    }
+
+    // ====== LOAD DATA ======
+    async function loadData(){
+      try{
+        const res = await fetch("../data/pdfs.json?_=" + Date.now());
+        data = await res.json();
+        if (!Array.isArray(data.items)) data.items = [];
+        setDirty(false);
+        render();
+      } catch(e){
+        data = { items: [] };
+        setDirty(false);
+        render();
+      }
+    }
+
+    // ====== EVENTS ======
+    qEl.addEventListener("input", render);
+    btnReload.addEventListener("click", loadData);
+
+    btnAdd.addEventListener("click", () => {
+      const title = inTitle.value.trim();
+      const file = inFile.files[0];
+
+      if (!title){
+        alert("Judul masih kosong.");
+        return;
+      }
+
+      let url = "";
+      if (file){
+        const fname = safeName(file.name);
+        stagedFiles.set(fname, file);
+        url = "pdf/" + fname;
+      }
+
+      data.items.push({ title, url });
+
+      inTitle.value = "";
+      inFile.value = "";
+      setDirty(true);
+      render();
     });
-  </script>
 
+    btnClose.addEventListener("click", closeEdit);
+
+    btnSave.addEventListener("click", () => {
+      if (editingIndex < 0) return;
+      data.items[editingIndex].title = edTitle.value.trim();
+      data.items[editingIndex].url = edUrl.value.trim();
+      setDirty(true);
+      closeEdit();
+      render();
+    });
+
+    btnDelete.addEventListener("click", () => {
+      if (editingIndex < 0) return;
+      if (!confirm("Yakin mau hapus item ini?")) return;
+      data.items.splice(editingIndex, 1);
+      setDirty(true);
+      closeEdit();
+      render();
+    });
+
+    // ====== DOWNLOAD ZIP ======
+    btnDownloadZip.addEventListener("click", async () => {
+      if (!dirty && stagedFiles.size === 0){
+        alert("Belum ada perubahan.");
+        return;
+      }
+
+      const zip = new JSZip();
+      zip.file("data/pdfs.json", JSON.stringify(data, null, 2));
+
+      const pdfFolder = zip.folder("pdf");
+      stagedFiles.forEach((file, name) => {
+        pdfFolder.file(name, file);
+      });
+
+      const blob = await zip.generateAsync({ type: "blob" });
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = "update-katalog-pdf.zip";
+      a.click();
+
+      setDirty(false);
+    });
+
+    // ====== INIT ======
+    loadData();
+  </script>
 </body>
 </html>
