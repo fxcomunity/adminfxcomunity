@@ -190,7 +190,8 @@
     </div>
 
     <div class="top-actions">
-      <a class="btn" href="/">⬅ Beranda</a>
+      <!-- FIX untuk GitHub Pages (repo: adminfxcomunity) -->
+      <a class="btn" href="../">⬅ Beranda</a>
       <button class="btn" id="btnReload">↻ Muat Data</button>
       <button class="btn primary" id="btnDownloadZip">⬇ Download ZIP Update</button>
     </div>
@@ -209,7 +210,7 @@
         <div class="body">
           <div class="list" id="list"></div>
           <p class="hint" style="margin-top:10px">
-            Perubahan di sini belum otomatis masuk ke Netlify (karena hosting statis).
+            Perubahan di sini belum otomatis masuk ke GitHub Pages (karena hosting statis).
             Setelah selesai, klik <b>Download ZIP Update</b> lalu upload isi ZIP ke repo GitHub.
           </p>
         </div>
@@ -426,7 +427,7 @@
       if (file){
         const fname = safeName(file.name);
         stagedFiles.set(fname, file);
-        url = "pdf/" + fname;
+        url = "pdf/" + fname; // relative dari root repo
       }
 
       data.items.push({ title, url });
