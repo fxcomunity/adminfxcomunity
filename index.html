@@ -5,26 +5,35 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Katalog PDF • FX Community</title>
 
+  <!-- FAVICON -->
+  <link rel="icon" href="https://i.ibb.co.com/kgNGgsgf/Screenshot-2025-12-23-062333.png">
+  <link rel="apple-touch-icon" href="https://i.ibb.co.com/kgNGgsgf/Screenshot-2025-12-23-062333.png">
+
+  <!-- FONT -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
 
-  <!-- CSS UTAMA (yang kamu paste) -->
+  <!-- CSS UTAMA -->
   <link rel="stylesheet" href="assets/style.css" />
 </head>
 
 <body>
 
-  <!-- Navbar -->
+  <!-- NAVBAR -->
   <header class="nav">
     <div class="nav-left">
       <div class="brand" style="display:flex;align-items:center;gap:10px">
-        <!-- Logo gambar (kalau mau emoji, ganti <img> jadi <div class="logo-badge">📚</div>) -->
-        <img class="logo-img" src="https://i.ibb.co.com/kgNGgsgf/Screenshot-2025-12-23-062333.png" alt="Logo">
+        <!-- LOGO HEADER -->
+        <img class="logo-img"
+             src="https://i.ibb.co.com/kgNGgsgf/Screenshot-2025-12-23-062333.png"
+             alt="FX Community Logo">
 
         <div class="title" style="display:flex;flex-direction:column;line-height:1.1">
           <b style="font-size:14px">Katalog PDF</b>
-          <span style="font-size:12px;color:var(--muted);margin-top:3px">FX Community • Dokumen Tersusun</span>
+          <span style="font-size:12px;color:var(--muted);margin-top:3px">
+            FX Community • Dokumen Tersusun
+          </span>
         </div>
       </div>
 
@@ -32,13 +41,13 @@
     </div>
 
     <div class="nav-right">
-      <button id="toggleTheme" class="btn ghost" type="button" title="Mode terang/gelap">🌙</button>
+      <button id="toggleTheme" class="btn ghost" type="button" title="Mode terang / gelap">🌙</button>
       <button id="toggleView" class="btn ghost" type="button" title="Ubah tampilan">⬛⬛</button>
       <a class="btn primary" href="admin/">Admin</a>
     </div>
   </header>
 
-  <!-- Hero -->
+  <!-- HERO -->
   <section class="hero">
     <div class="hero-inner">
       <h1>Koleksi Dokumen PDF</h1>
@@ -63,7 +72,7 @@
     </div>
   </section>
 
-  <!-- Main -->
+  <!-- MAIN -->
   <main class="container">
     <h2 class="section-title">📂 Daftar PDF</h2>
 
@@ -78,10 +87,12 @@
     </div>
   </main>
 
+  <!-- FOOTER -->
   <footer class="footer">
-    © <span id="year"></span> Katalog PDF · 陈嘉杰 | Val
+    © <span id="year"></span> Katalog PDF · FX Community
   </footer>
 
+  <!-- JS -->
   <script src="assets/app.js"></script>
 </body>
 </html>
