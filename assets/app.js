@@ -1,6 +1,6 @@
-// assets/app.js (untuk index.html root)
+// assets/app.js (untuk index.html)
 
-const $ = (sel) => document.querySelector(sel);
+const $ = (s) => document.querySelector(s);
 
 const listEl = $("#list");
 const emptyEl = $("#empty");
@@ -14,27 +14,12 @@ const toggleViewBtn = $("#toggleView");
 const toggleThemeBtn = $("#toggleTheme");
 
 let allItems = [];
-let viewMode = "grid"; // "grid" | "list"
+let viewMode = localStorage.getItem("viewMode") || "grid"; // grid | list
 
-// ---------- helpers ----------
 function escapeHtml(str = "") {
   return String(str).replace(/[&<>"']/g, (m) => ({
-    "&": "&amp;",
-    "<": "&lt;",
-    ">": "&gt;",
-    '"': "&quot;",
-    "'": "&#039;",
+    "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#039;",
   }[m]));
-}
-
-function toBasePath(url) {
-  // kalau url sudah absolute (https://...) biarin
-  if (!url) return "";
-  if (/^https?:\/\//i.test(url)) return url;
-
-  // kalau url relatif seperti "pdf/nama.pdf" atau "preview/..."
-  // dari beranda (root) cukup pakai apa adanya:
-  return url.replace(/^\/+/, "");
 }
 
 function formatDate(d) {
@@ -48,11 +33,7 @@ function formatDate(d) {
 }
 
 function setEmpty(isEmpty) {
-  if (isEmpty) {
-    emptyEl.classList.remove("hidden");
-  } else {
-    emptyEl.classList.add("hidden");
-  }
+  emptyEl.classList.toggle("hidden", !isEmpty);
 }
 
 function setCount(n) {
@@ -69,7 +50,6 @@ function getCategories(items) {
 }
 
 function renderCategoryOptions(categories) {
-  // reset
   categoryEl.innerHTML = `<option value="all">Semua Kategori</option>`;
   categories.forEach((c) => {
     const opt = document.createElement("option");
@@ -77,6 +57,54 @@ function renderCategoryOptions(categories) {
     opt.textContent = c;
     categoryEl.appendChild(opt);
   });
+}
+
+function toHref(url) {
+  if (!url) return "";
+  if (/^https?:\/\//i.test(url)) return url;
+  return url.replace(/^\/+/, ""); // relatif dari root
+}
+
+function render(items) {
+  if (!items.length) {
+    listEl.innerHTML = "";
+    return;
+  }
+
+  // ubah ikon tombol view
+  toggleViewBtn.textContent = viewMode === "grid" ? "⬛⬛" : "☰";
+
+  listEl.innerHTML = items.map((it) => {
+    const title = it.title || it.judul || "Tanpa judul";
+    const desc = it.desc || it.deskripsi || "";
+    const category = it.category || it.kategori || "";
+    const url = toHref(it.url || it.link || it.file || "");
+    const preview = toHref(it.preview || it.embed || "");
+    const openUrl = url || preview;
+
+    if (viewMode === "list") {
+      return `
+        <div class="card" style="display:flex;gap:12px;align-items:flex-start">
+          <div style="flex:1">
+            <h3 style="margin:0 0 6px">${escapeHtml(title)}</h3>
+            ${desc ? `<div class="sub">${escapeHtml(desc)}</div>` : ""}
+            ${category ? `<div style="color:var(--muted);font-size:12px;margin-top:8px">🏷️ ${escapeHtml(category)}</div>` : ""}
+          </div>
+          ${openUrl ? `<a class="btn primary" href="${escapeHtml(openUrl)}" target="_blank" rel="noopener">Buka</a>` : ""}
+        </div>
+      `;
+    }
+
+    return `
+      <div class="card">
+        <h3>${escapeHtml(title)}</h3>
+        ${desc ? `<div class="sub">${escapeHtml(desc)}</div>` : ""}
+        ${category ? `<div style="color:var(--muted);font-size:12px;margin:-4px 0 12px">🏷️ ${escapeHtml(category)}</div>` : ""}
+        ${preview ? `<iframe src="${escapeHtml(preview)}" loading="lazy"></iframe>` : ""}
+        ${openUrl ? `<div style="margin-top:12px"><a class="btn primary" href="${escapeHtml(openUrl)}" target="_blank" rel="noopener">Buka</a></div>` : ""}
+      </div>
+    `;
+  }).join("");
 }
 
 function applyFilters() {
@@ -93,97 +121,11 @@ function applyFilters() {
     return matchQ && matchCat;
   });
 
-  renderList(filtered);
+  render(filtered);
   setCount(filtered.length);
   setEmpty(filtered.length === 0);
 }
 
-function makeCard(it) {
-  const title = it.title || it.judul || "Tanpa judul";
-  const desc = it.desc || it.deskripsi || "";
-  const category = it.category || it.kategori || "";
-  const url = toBasePath(it.url || it.link || it.file || "");
-  const preview = toBasePath(it.preview || it.embed || "");
-
-  // kalau ada preview gunakan iframe, kalau tidak ada tampilkan tombol buka
-  const previewHtml = preview
-    ? `<iframe src="${escapeHtml(preview)}" loading="lazy"></iframe>`
-    : "";
-
-  const openUrl = url || preview;
-
-  return `
-    <div class="card">
-      <h3>${escapeHtml(title)}</h3>
-      ${desc ? `<div style="color:#a1a1aa;font-size:13px;line-height:1.4;margin:-6px 0 12px">${escapeHtml(desc)}</div>` : ""}
-      ${category ? `<div style="color:#a1a1aa;font-size:12px;margin:-4px 0 12px">🏷️ ${escapeHtml(category)}</div>` : ""}
-      ${previewHtml}
-      ${openUrl ? `
-        <div style="margin-top:12px">
-          <a class="btn primary" href="${escapeHtml(openUrl)}" target="_blank" rel="noopener">Buka</a>
-        </div>
-      ` : ""}
-    </div>
-  `;
-}
-
-function makeRow(it) {
-  const title = it.title || it.judul || "Tanpa judul";
-  const desc = it.desc || it.deskripsi || "";
-  const category = it.category || it.kategori || "";
-  const url = toBasePath(it.url || it.link || it.file || "");
-  const preview = toBasePath(it.preview || it.embed || "");
-  const openUrl = url || preview;
-
-  return `
-    <div class="card" style="display:flex;gap:12px;align-items:flex-start">
-      <div style="flex:1">
-        <h3 style="margin:0 0 6px">${escapeHtml(title)}</h3>
-        ${desc ? `<div style="color:#a1a1aa;font-size:13px;line-height:1.4">${escapeHtml(desc)}</div>` : ""}
-        ${category ? `<div style="color:#a1a1aa;font-size:12px;margin-top:8px">🏷️ ${escapeHtml(category)}</div>` : ""}
-      </div>
-      ${openUrl ? `<a class="btn primary" href="${escapeHtml(openUrl)}" target="_blank" rel="noopener">Buka</a>` : ""}
-    </div>
-  `;
-}
-
-function renderList(items) {
-  // set layout class di container
-  listEl.className = viewMode === "grid" ? "grid" : "grid";
-  // list mode = masih pake grid tapi kartu melebar (dibikin di makeRow)
-
-  if (!items.length) {
-    listEl.innerHTML = "";
-    return;
-  }
-
-  listEl.innerHTML = items
-    .map((it) => (viewMode === "grid" ? makeCard(it) : makeRow(it)))
-    .join("");
-}
-
-// ---------- theme & view ----------
-function initTheme() {
-  const saved = localStorage.getItem("theme") || "dark";
-  document.documentElement.dataset.theme = saved; // kalau css kamu pakai
-  toggleThemeBtn.textContent = saved === "dark" ? "🌙" : "☀️";
-}
-
-function toggleTheme() {
-  const cur = localStorage.getItem("theme") || "dark";
-  const next = cur === "dark" ? "light" : "dark";
-  localStorage.setItem("theme", next);
-  document.documentElement.dataset.theme = next;
-  toggleThemeBtn.textContent = next === "dark" ? "🌙" : "☀️";
-}
-
-function toggleView() {
-  viewMode = viewMode === "grid" ? "list" : "grid";
-  toggleViewBtn.textContent = viewMode === "grid" ? "⬛⬛" : "☰";
-  applyFilters();
-}
-
-// ---------- data load ----------
 async function loadData() {
   listEl.innerHTML = "Loading…";
 
@@ -191,30 +133,53 @@ async function loadData() {
     const res = await fetch("data/pdfs.json?_=" + Date.now());
     const raw = await res.json();
 
-    // dukung 2 format:
-    // 1) { updatedAt: "...", items: [...] }
-    // 2) [ ... ]
     const items = Array.isArray(raw) ? raw : (raw.items || []);
     allItems = items;
 
-    const updatedAt = Array.isArray(raw) ? null : raw.updatedAt;
-    updatedAtEl.textContent = updatedAt ? formatDate(updatedAt) : "-";
+    updatedAtEl.textContent = Array.isArray(raw) ? "-" : formatDate(raw.updatedAt);
 
     renderCategoryOptions(getCategories(allItems));
     applyFilters();
   } catch (e) {
     console.error(e);
-    listEl.innerHTML = `<div class="empty-card" style="padding:18px">
+    listEl.innerHTML = `<div class="empty-card">
       <div class="empty-title">Gagal memuat data</div>
-      <div class="empty-sub">Pastikan file <b>data/pdfs.json</b> ada di repo dan bisa diakses.</div>
+      <div class="empty-sub">Pastikan file <b>data/pdfs.json</b> ada dan bisa diakses.</div>
     </div>`;
     setCount(0);
     setEmpty(true);
   }
 }
 
-// ---------- init ----------
+/* ---------- THEME (ini yang bikin mode malam/pagi beneran jalan) ---------- */
+function getTheme() {
+  return localStorage.getItem("theme") || "dark";
+}
+
+function setTheme(theme) {
+  document.documentElement.setAttribute("data-theme", theme);
+  localStorage.setItem("theme", theme);
+
+  // ikon tombol ikut berubah
+  if (toggleThemeBtn) toggleThemeBtn.textContent = theme === "dark" ? "🌙" : "☀️";
+}
+
+function toggleTheme() {
+  const next = getTheme() === "dark" ? "light" : "dark";
+  setTheme(next);
+}
+
+/* ---------- VIEW ---------- */
+function toggleView() {
+  viewMode = viewMode === "grid" ? "list" : "grid";
+  localStorage.setItem("viewMode", viewMode);
+  applyFilters();
+}
+
+/* ---------- INIT ---------- */
 yearEl.textContent = String(new Date().getFullYear());
+
+setTheme(getTheme());
 
 toggleThemeBtn?.addEventListener("click", toggleTheme);
 toggleViewBtn?.addEventListener("click", toggleView);
@@ -222,5 +187,4 @@ toggleViewBtn?.addEventListener("click", toggleView);
 searchEl?.addEventListener("input", applyFilters);
 categoryEl?.addEventListener("change", applyFilters);
 
-initTheme();
 loadData();
