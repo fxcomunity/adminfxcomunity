@@ -14,12 +14,15 @@
 
   <style>
     :root{
-      --bg1:#0b1220; --bg2:#151a33;
-      --border: rgba(255,255,255,.12);
+      --bg1:#070b18; --bg2:#121737;
+      --glass: rgba(255,255,255,.07);
+      --glass2: rgba(255,255,255,.04);
+      --border: rgba(255,255,255,.14);
       --text:#e5e7eb; --muted:#a1a1aa;
       --primary:#7c3aed; --primary2:#6d28d9;
-      --shadow: 0 20px 60px rgba(0,0,0,.45);
-      --bad:#ef4444; --ok:#22c55e;
+      --ok:#22c55e; --bad:#ef4444; --warn:#f59e0b;
+      --shadow: 0 26px 90px rgba(0,0,0,.55);
+      --shadow2: 0 18px 55px rgba(0,0,0,.35);
     }
     *{box-sizing:border-box;margin:0;padding:0}
     body{
@@ -27,27 +30,46 @@
       color:var(--text);
       min-height:100vh;
       background:
-        radial-gradient(1000px 600px at 10% 10%, #2b2f66 0%, transparent 60%),
-        radial-gradient(900px 500px at 90% 20%, #3b1f6e 0%, transparent 55%),
+        radial-gradient(1200px 650px at 12% 10%, rgba(124,58,237,.30) 0%, transparent 60%),
+        radial-gradient(900px 520px at 90% 18%, rgba(59,130,246,.20) 0%, transparent 55%),
         linear-gradient(135deg, var(--bg1), var(--bg2));
+      overflow-x:hidden;
     }
+    body:before{
+      content:"";
+      position:fixed; inset:0;
+      background-image:
+        linear-gradient(to right, rgba(255,255,255,.06) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(255,255,255,.06) 1px, transparent 1px);
+      background-size: 52px 52px;
+      opacity:.05;
+      pointer-events:none;
+      z-index:-1;
+    }
+
+    /* TOPBAR */
     .topbar{
-      position:sticky; top:0; z-index:10;
+      position:sticky; top:0; z-index:50;
       display:flex; align-items:center; justify-content:space-between;
       padding:14px 18px;
-      background: rgba(0,0,0,.35);
-      backdrop-filter: blur(10px);
-      border-bottom: 1px solid var(--border);
+      backdrop-filter: blur(14px);
+      background: rgba(0,0,0,.28);
+      border-bottom:1px solid var(--border);
     }
     .brand{display:flex; gap:12px; align-items:center}
-    .brand img{width:24px;height:24px;border-radius:6px;object-fit:contain}
-    .brand b{font-size:15px}
-    .brand span{display:block; font-size:12px; color:var(--muted); margin-top:2px}
+    .brand img{
+      width:26px;height:26px;border-radius:8px;object-fit:contain;
+      box-shadow: 0 12px 35px rgba(0,0,0,.45);
+    }
+    .brand b{font-size:15px;letter-spacing:-.01em}
+    .brand span{display:block;font-size:12px;color:var(--muted);margin-top:2px}
 
     .top-actions{display:flex; gap:10px; flex-wrap:wrap; align-items:center}
+
+    /* BUTTON */
     .btn{
       border:1px solid var(--border);
-      background: rgba(255,255,255,.06);
+      background: var(--glass2);
       color:var(--text);
       padding:10px 12px;
       border-radius:14px;
@@ -60,41 +82,148 @@
       transition:.15s;
       user-select:none;
     }
-    .btn:hover{transform: translateY(-1px); border-color: rgba(124,58,237,.5)}
+    .btn:hover{transform: translateY(-1px); border-color: rgba(124,58,237,.55)}
     .btn.primary{background: linear-gradient(135deg,var(--primary),var(--primary2)); border-color:transparent}
-    .btn.danger{background: rgba(239,68,68,.15); border-color: rgba(239,68,68,.35)}
+    .btn.danger{background: rgba(239,68,68,.14); border-color: rgba(239,68,68,.32)}
     .btn:disabled{opacity:.55; cursor:not-allowed; transform:none}
 
     .wrap{max-width:1100px; margin:0 auto; padding:18px}
+
+    /* PANELS */
     .panel{
-      background: linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.05));
+      background: linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.05));
       border:1px solid var(--border);
-      border-radius:22px;
-      box-shadow: var(--shadow);
+      border-radius:24px;
+      box-shadow: var(--shadow2);
       overflow:hidden;
     }
     .panel h2{
-      padding:16px 16px 10px;
+      padding:16px 18px 12px;
       font-size:15px;
       font-weight:900;
-      border-bottom:1px solid rgba(255,255,255,.10);
+      border-bottom:1px solid rgba(255,255,255,.12);
+      display:flex; align-items:center; justify-content:space-between;
+      gap:10px;
     }
-    .panel .body{padding:14px 16px 16px}
+    .panel .body{padding:16px 18px 18px}
 
+    .hidden{display:none !important}
+
+    /* LOGIN HERO CARD */
+    .login-shell{
+      display:grid;
+      grid-template-columns: 1.15fr .85fr;
+      gap:14px;
+      align-items:stretch;
+    }
+    @media (max-width: 980px){
+      .login-shell{grid-template-columns:1fr}
+    }
+
+    .hero-card{
+      position:relative;
+      border-radius:26px;
+      border:1px solid rgba(255,255,255,.12);
+      background: linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.04));
+      box-shadow: var(--shadow);
+      overflow:hidden;
+      padding:26px 22px;
+      min-height: 340px;
+    }
+    .hero-card:before{
+      content:"";
+      position:absolute; inset:-2px;
+      background:
+        radial-gradient(520px 240px at 18% 18%, rgba(124,58,237,.28), transparent 60%),
+        radial-gradient(520px 240px at 86% 10%, rgba(59,130,246,.18), transparent 62%);
+      opacity:.9;
+      pointer-events:none;
+    }
+    .hero-card > *{position:relative}
+    .kicker{
+      display:inline-flex; align-items:center; gap:10px;
+      padding:8px 12px;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.05);
+      color:var(--muted);
+      font-size:12px;
+      font-weight:800;
+      margin-bottom:14px;
+    }
+    .kicker i{
+      width:8px;height:8px;border-radius:999px;
+      background: var(--ok);
+      display:inline-block;
+      box-shadow: 0 0 0 4px rgba(34,197,94,.15);
+    }
+    .hero-card h1{
+      font-size:34px;
+      line-height:1.1;
+      letter-spacing:-.03em;
+      margin:0 0 10px;
+      font-weight:900;
+    }
+    .hero-card p{
+      color:var(--muted);
+      margin:0 0 14px;
+      line-height:1.6;
+      max-width: 55ch;
+    }
+    .hero-points{
+      margin-top:18px;
+      display:grid;
+      gap:10px;
+    }
+    .point{
+      display:flex; gap:10px; align-items:flex-start;
+      padding:10px 12px;
+      border-radius:16px;
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.05);
+    }
+    .point b{font-size:13px}
+    .point span{display:block;font-size:12px;color:var(--muted);margin-top:2px;line-height:1.4}
+    .dot{
+      width:10px;height:10px;border-radius:999px;
+      background: rgba(124,58,237,.9);
+      box-shadow: 0 0 0 4px rgba(124,58,237,.14);
+      margin-top:4px;
+    }
+
+    /* FORM */
     .row{display:grid; gap:10px}
     .field label{font-size:12px; color:var(--muted); display:block; margin-bottom:6px}
-    .field input{
-      width:100%;
+    .control{
+      display:flex; align-items:center; gap:10px;
       padding:11px 12px;
-      border-radius:14px;
-      border:1px solid rgba(255,255,255,.14);
+      border-radius:16px;
+      border:1px solid rgba(255,255,255,.16);
       background: rgba(255,255,255,.06);
-      color:var(--text);
-      outline:none;
     }
-    .hint{font-size:12px; color:var(--muted); line-height:1.5}
-    .hr{height:1px;background:rgba(255,255,255,.10);margin:14px 0}
-    .hidden{display:none !important}
+    .control .icon{opacity:.9}
+    .control input{
+      width:100%;
+      border:0; outline:none;
+      background: transparent;
+      color: var(--text);
+      font-size:14px;
+    }
+    .iconbtn{
+      border:1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.05);
+      color: var(--text);
+      border-radius:12px;
+      padding:8px 10px;
+      cursor:pointer;
+      font-weight:900;
+      transition:.15s;
+    }
+    .iconbtn:hover{transform: translateY(-1px); border-color: rgba(124,58,237,.55)}
+    .hint{font-size:12px;color:var(--muted);line-height:1.5}
+    .hr{height:1px;background:rgba(255,255,255,.12);margin:14px 0}
+
+    /* MSG */
     .msg{
       padding:10px 12px;border-radius:14px;font-size:13px;
       border:1px solid rgba(255,255,255,.14);
@@ -103,6 +232,7 @@
     .msg.error{border-color: rgba(239,68,68,.35); background: rgba(239,68,68,.12); color:#fecaca}
     .msg.ok{border-color: rgba(34,197,94,.28); background: rgba(34,197,94,.12); color:#bbf7d0}
 
+    /* DASH LIST */
     .list{display:grid; gap:10px}
     .item{
       border:1px solid rgba(255,255,255,.12);
@@ -114,6 +244,53 @@
     }
     .item .meta b{display:block; font-size:14px; margin-bottom:4px}
     .item .meta small{color:var(--muted); word-break: break-all}
+
+    /* TOAST */
+    .toast{
+      position:fixed;
+      right:16px; bottom:16px;
+      width:min(420px, calc(100% - 32px));
+      z-index:100;
+      display:grid;
+      gap:10px;
+      pointer-events:none;
+    }
+    .toast .t{
+      pointer-events:auto;
+      padding:12px 12px;
+      border-radius:16px;
+      border:1px solid rgba(255,255,255,.14);
+      background: rgba(0,0,0,.40);
+      backdrop-filter: blur(12px);
+      box-shadow: var(--shadow2);
+      display:flex;
+      align-items:flex-start;
+      gap:10px;
+      animation: pop .18s ease-out;
+    }
+    @keyframes pop{
+      from{transform: translateY(10px); opacity:0}
+      to{transform: translateY(0); opacity:1}
+    }
+    .t .badge{
+      width:28px;height:28px;border-radius:12px;
+      display:grid;place-items:center;
+      background: rgba(124,58,237,.22);
+      border:1px solid rgba(124,58,237,.35);
+      font-weight:900;
+    }
+    .t b{display:block;font-size:13px;margin-bottom:2px}
+    .t span{display:block;font-size:12px;color:var(--muted);line-height:1.4}
+
+    .mini{
+      display:inline-flex; align-items:center; gap:8px;
+      padding:7px 10px; border-radius:999px;
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.05);
+      color:var(--muted);
+      font-size:12px;
+      font-weight:800;
+    }
   </style>
 
   <!-- Supabase JS (CDN) -->
@@ -126,8 +303,8 @@
   <div class="brand">
     <img src="https://i.ibb.co.com/kgNGgsgf/Screenshot-2025-12-23-062333.png" alt="Logo">
     <div>
-      <b>Admin • Kelola PDF</b>
-      <span>Login beneran via Supabase</span>
+      <b>Admin • FX Community</b>
+      <span>Login aman via Supabase</span>
     </div>
   </div>
 
@@ -139,35 +316,90 @@
 
 <div class="wrap">
 
-  <!-- LOGIN -->
-  <div class="panel" id="loginPanel">
-    <h2>Login Admin</h2>
-    <div class="body">
-      <div class="row">
-        <div id="loginMsg" class="msg error hidden"></div>
+  <!-- LOGIN (MEWAH) -->
+  <div class="login-shell" id="loginPanel">
 
-        <div class="field">
-          <label>Email</label>
-          <input id="email" type="email" placeholder="admin@..." autocomplete="username" />
+    <!-- Left: hero -->
+    <div class="hero-card">
+      <div class="kicker"><i></i> Secure Admin Access</div>
+      <h1>Masuk Admin<br/>dengan aman & elegan.</h1>
+      <p>
+        Panel ini pakai <b>Supabase Auth</b>, jadi password tersimpan aman (bukan di localStorage).
+        Kamu bisa login, logout, dan ganti password langsung dari sini.
+      </p>
+
+      <div class="hero-points">
+        <div class="point">
+          <div class="dot"></div>
+          <div>
+            <b>Login beneran</b>
+            <span>Email & password diverifikasi oleh Supabase.</span>
+          </div>
         </div>
-
-        <div class="field">
-          <label>Password</label>
-          <input id="password" type="password" placeholder="••••••••" autocomplete="current-password" />
+        <div class="point">
+          <div class="dot"></div>
+          <div>
+            <b>Ganti password</b>
+            <span>Update password akun admin tanpa edit kode.</span>
+          </div>
         </div>
-
-        <button class="btn primary" id="btnLogin">Masuk</button>
-
-        <p class="hint">
-          Kalau email/password salah akan muncul alert + pesan error.
-        </p>
+        <div class="point">
+          <div class="dot"></div>
+          <div>
+            <b>Kontrol admin</b>
+            <span>Bisa batasi hanya email tertentu (opsional).</span>
+          </div>
+        </div>
       </div>
     </div>
+
+    <!-- Right: form -->
+    <div class="panel">
+      <h2>
+        Login Admin
+        <span class="mini" title="Status koneksi">🔐 Auth</span>
+      </h2>
+
+      <div class="body">
+        <div class="row">
+          <div id="loginMsg" class="msg error hidden"></div>
+
+          <div class="field">
+            <label>Email</label>
+            <div class="control">
+              <span class="icon">📧</span>
+              <input id="email" type="email" placeholder="admin@..." autocomplete="username" />
+            </div>
+          </div>
+
+          <div class="field">
+            <label>Password</label>
+            <div class="control">
+              <span class="icon">🔑</span>
+              <input id="password" type="password" placeholder="••••••••" autocomplete="current-password" />
+              <button class="iconbtn" id="btnTogglePass" type="button" title="Lihat/Sembunyikan">👁️</button>
+            </div>
+          </div>
+
+          <button class="btn primary" id="btnLogin" type="button">Masuk</button>
+
+          <p class="hint">
+            Kalau email/password salah → muncul alert + pesan error.
+            Pastikan user admin sudah dibuat di <b>Supabase → Auth → Users</b>.
+          </p>
+        </div>
+      </div>
+    </div>
+
   </div>
 
   <!-- DASHBOARD -->
   <div class="panel hidden" id="dashPanel">
-    <h2>Dashboard</h2>
+    <h2>
+      Dashboard
+      <span class="mini" id="whoamiMini">👤 -</span>
+    </h2>
+
     <div class="body">
       <div id="dashMsg" class="msg ok hidden"></div>
       <div class="hint" id="whoami"></div>
@@ -180,18 +412,25 @@
 
         <div class="field">
           <label>Password baru</label>
-          <input id="newPass" type="password" placeholder="minimal 6 karakter" autocomplete="new-password" />
+          <div class="control">
+            <span class="icon">🆕</span>
+            <input id="newPass" type="password" placeholder="minimal 6 karakter" autocomplete="new-password" />
+            <button class="iconbtn" id="btnToggleNewPass" type="button" title="Lihat/Sembunyikan">👁️</button>
+          </div>
         </div>
 
         <div class="field">
           <label>Ulangi password baru</label>
-          <input id="newPass2" type="password" placeholder="ulangin lagi" autocomplete="new-password" />
+          <div class="control">
+            <span class="icon">✅</span>
+            <input id="newPass2" type="password" placeholder="ulangin lagi" autocomplete="new-password" />
+          </div>
         </div>
 
-        <button class="btn primary" id="btnChangePass">Simpan Password</button>
+        <button class="btn primary" id="btnChangePass" type="button">Simpan Password</button>
 
         <p class="hint">
-          Ini beneran ganti password akun Supabase (bukan localStorage).
+          Ini beneran ganti password akun Supabase.
         </p>
       </div>
 
@@ -200,13 +439,18 @@
       <!-- LIST PDF -->
       <b style="font-size:14px">Daftar PDF (dari ../data/pdfs.json)</b>
       <div class="list" id="list" style="margin-top:10px">Loading…</div>
+
       <p class="hint" style="margin-top:10px">
-        Catatan: GitHub Pages tidak bisa “save ke repo” langsung dari browser. Workflow upload ke repo tetap manual.
+        Catatan: GitHub Pages tidak bisa “save ke repo” langsung dari browser.
+        Workflow upload ke repo tetap manual.
       </p>
     </div>
   </div>
 
 </div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
 
 <script>
   /* =========================
@@ -215,8 +459,10 @@
   const SUPABASE_URL = "https://stvutgjyjftgjjexbrvd.supabase.co";
   const SUPABASE_ANON_KEY = "sb_publishable_zdgWtC2m1YFLW8gDtrL1HA_H99b4BWX";
 
-  /* Opsional: batasi hanya 1 email admin (isi kalau mau) */
-  const ADMIN_EMAIL = ""; // contoh: "admin@fxcommunity.com"
+  /* Optional: batasi hanya email tertentu (multi admin) */
+  const ADMIN_EMAILS = []; 
+  // contoh:
+  // const ADMIN_EMAILS = ["admin1@email.com", "admin2@email.com"];
 
   const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
@@ -228,6 +474,7 @@
   const loginMsg   = document.getElementById("loginMsg");
   const dashMsg    = document.getElementById("dashMsg");
   const whoami     = document.getElementById("whoami");
+  const whoamiMini = document.getElementById("whoamiMini");
 
   const emailEl    = document.getElementById("email");
   const passEl     = document.getElementById("password");
@@ -237,10 +484,28 @@
   const newPass2El = document.getElementById("newPass2");
   const btnChangePass = document.getElementById("btnChangePass");
 
+  const btnTogglePass = document.getElementById("btnTogglePass");
+  const btnToggleNewPass = document.getElementById("btnToggleNewPass");
+
   const listEl = document.getElementById("list");
+  const toastEl = document.getElementById("toast");
 
   function show(el){ el.classList.remove("hidden"); }
   function hide(el){ el.classList.add("hidden"); }
+
+  function toast(title, desc=""){
+    const t = document.createElement("div");
+    t.className = "t";
+    t.innerHTML = `
+      <div class="badge">✨</div>
+      <div>
+        <b>${escapeHtml(title)}</b>
+        <span>${escapeHtml(desc)}</span>
+      </div>
+    `;
+    toastEl.appendChild(t);
+    setTimeout(()=>{ t.remove(); }, 2600);
+  }
 
   function showLoginError(text){
     loginMsg.textContent = text;
@@ -250,10 +515,22 @@
     hide(loginMsg);
     loginMsg.textContent = "";
   }
-  function toastOk(text){
+  function toastOkInDash(text){
     dashMsg.textContent = text;
     show(dashMsg);
     setTimeout(()=>hide(dashMsg), 2500);
+  }
+
+  function escapeHtml(str=""){
+    return String(str).replace(/[&<>"']/g, m => ({
+      "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"
+    }[m]));
+  }
+
+  function isAllowedEmail(userEmail){
+    if (!ADMIN_EMAILS.length) return true;
+    const u = (userEmail || "").toLowerCase();
+    return ADMIN_EMAILS.map(e => String(e).toLowerCase()).includes(u);
   }
 
   async function loadList(){
@@ -276,14 +553,15 @@
         const left = document.createElement("div");
         left.className = "meta";
         left.innerHTML = `
-          <b>${it.title || "Tanpa judul"}</b>
-          <small>${it.url || ""}</small>
+          <b>${escapeHtml(it.title || "Tanpa judul")}</b>
+          <small>${escapeHtml(it.url || "")}</small>
         `;
 
         const open = document.createElement("a");
         open.className = "btn";
         open.target = "_blank";
         open.rel = "noopener";
+
         if (it.url){
           open.href = it.url.startsWith("http") ? it.url : "../" + it.url;
           open.textContent = "Buka";
@@ -298,7 +576,8 @@
         row.appendChild(open);
         listEl.appendChild(row);
       });
-    }catch(e){
+    } catch (e){
+      console.error(e);
       listEl.innerHTML = "<div class='msg error'>Gagal memuat ../data/pdfs.json</div>";
     }
   }
@@ -315,9 +594,10 @@
 
     const userEmail = session.user?.email || "";
 
-    if (ADMIN_EMAIL && userEmail.toLowerCase() !== ADMIN_EMAIL.toLowerCase()){
+    if (!isAllowedEmail(userEmail)){
       await supabase.auth.signOut();
       alert("Akun ini bukan admin.");
+      toast("Ditolak", "Akun ini bukan admin.");
       show(loginPanel);
       hide(dashPanel);
       hide(btnLogout);
@@ -329,9 +609,29 @@
     show(btnLogout);
 
     whoami.textContent = "Login sebagai: " + userEmail;
+    whoamiMini.textContent = "👤 " + userEmail;
 
     loadList();
   }
+
+  function setLoading(btn, loading){
+    if (!btn) return;
+    btn.disabled = loading;
+    btn.dataset._txt = btn.dataset._txt || btn.textContent;
+    btn.textContent = loading ? "Loading…" : btn.dataset._txt;
+  }
+
+  btnTogglePass.addEventListener("click", ()=>{
+    const isPass = passEl.type === "password";
+    passEl.type = isPass ? "text" : "password";
+    btnTogglePass.textContent = isPass ? "🙈" : "👁️";
+  });
+
+  btnToggleNewPass.addEventListener("click", ()=>{
+    const isPass = newPassEl.type === "password";
+    newPassEl.type = isPass ? "text" : "password";
+    btnToggleNewPass.textContent = isPass ? "🙈" : "👁️";
+  });
 
   btnLogin.addEventListener("click", async ()=>{
     clearLoginError();
@@ -345,28 +645,33 @@
       return;
     }
 
+    setLoading(btnLogin, true);
     const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+    setLoading(btnLogin, false);
 
     if (error){
       showLoginError("Login gagal: " + error.message);
       alert("Login gagal: " + error.message);
+      toast("Login gagal", error.message);
       return;
     }
 
     const userEmail = data.user?.email || "";
-    if (ADMIN_EMAIL && userEmail.toLowerCase() !== ADMIN_EMAIL.toLowerCase()){
+    if (!isAllowedEmail(userEmail)){
       await supabase.auth.signOut();
       alert("Akun ini bukan admin.");
+      toast("Ditolak", "Akun ini bukan admin.");
       return;
     }
 
-    toastOk("Berhasil login ✅");
+    toast("Berhasil", "Login sukses ✅");
     await setUIForSession();
   });
 
   btnLogout.addEventListener("click", async ()=>{
     await supabase.auth.signOut();
     alert("Logout berhasil.");
+    toast("Logout", "Sampai ketemu lagi 👋");
     await setUIForSession();
   });
 
@@ -376,31 +681,38 @@
 
     if (p1.length < 6){
       alert("Password baru minimal 6 karakter.");
+      toast("Gagal", "Password minimal 6 karakter.");
       return;
     }
     if (p1 !== p2){
       alert("Ulangi password tidak sama.");
+      toast("Gagal", "Konfirmasi password tidak sama.");
       return;
     }
 
     const { data: { session } } = await supabase.auth.getSession();
     if (!session){
       alert("Session login hilang. Login ulang ya.");
+      toast("Session hilang", "Login ulang dulu ya.");
       await setUIForSession();
       return;
     }
 
+    setLoading(btnChangePass, true);
     const { error } = await supabase.auth.updateUser({ password: p1 });
+    setLoading(btnChangePass, false);
 
     if (error){
       alert("Gagal ganti password: " + error.message);
+      toast("Gagal", error.message);
       return;
     }
 
     newPassEl.value = "";
     newPass2El.value = "";
-    toastOk("Password berhasil diganti ✅");
+    toastOkInDash("Password berhasil diganti ✅");
     alert("Password berhasil diganti ✅");
+    toast("Sukses", "Password berhasil diganti ✅");
   });
 
   // Init
