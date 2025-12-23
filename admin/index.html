@@ -20,6 +20,7 @@
       --primary:#7c3aed; --primary2:#6d28d9;
       --shadow: 0 20px 60px rgba(0,0,0,.45);
       --ok:#22c55e; --warn:#f59e0b; --bad:#ef4444;
+      --card: rgba(255,255,255,.06);
     }
     *{box-sizing:border-box;margin:0;padding:0}
     body{
@@ -62,12 +63,17 @@
       align-items:center;
       gap:8px;
       transition:.15s;
+      user-select:none;
     }
     .btn:hover{transform: translateY(-1px); border-color: rgba(124,58,237,.5)}
     .btn.primary{background: linear-gradient(135deg,var(--primary),var(--primary2)); border-color:transparent}
     .btn.danger{background: rgba(239,68,68,.15); border-color: rgba(239,68,68,.25)}
+    .btn:disabled{opacity:.55; cursor:not-allowed; transform:none}
 
     .wrap{max-width:1100px; margin:0 auto; padding:18px}
+    .grid{display:grid; grid-template-columns: 1.1fr .9fr; gap:14px}
+    @media (max-width: 980px){ .grid{grid-template-columns:1fr} }
+
     .panel{
       background: linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.05));
       border:1px solid var(--border);
@@ -83,6 +89,32 @@
     }
     .panel .body{padding:14px 16px 16px}
 
+    .toolbar{
+      display:flex; gap:10px; flex-wrap:wrap; align-items:center;
+      padding:12px 16px;
+      border-bottom:1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.03);
+    }
+    .toolbar input{
+      flex:1;
+      padding:10px 12px;
+      border-radius:14px;
+      border:1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.06);
+      color:var(--text);
+      outline:none;
+      min-width:220px;
+    }
+
+    .pill{
+      display:inline-flex; align-items:center; gap:8px;
+      padding:7px 10px; border-radius:999px;
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.06);
+      font-size:12px; color:var(--muted);
+    }
+    .pill i{width:8px;height:8px;border-radius:999px; background: var(--ok); display:inline-block}
+
     .list{display:grid; gap:10px}
     .item{
       border:1px solid rgba(255,255,255,.12);
@@ -94,6 +126,76 @@
     }
     .item .meta b{display:block; font-size:14px; margin-bottom:4px}
     .item .meta small{color:var(--muted); word-break: break-all}
+
+    .field{margin-bottom:10px}
+    .field label{font-size:12px; color:var(--muted); display:block; margin-bottom:6px}
+    .field input, .field textarea, .field select{
+      width:100%;
+      padding:11px 12px;
+      border-radius:14px;
+      border:1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.06);
+      color:var(--text);
+      outline:none;
+    }
+    .hint{font-size:12px; color:var(--muted); line-height:1.5}
+
+    /* LOGIN */
+    .login-wrap{
+      max-width:540px; margin:50px auto 0; padding:18px;
+    }
+    .login-card{
+      background: linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.05));
+      border:1px solid var(--border);
+      border-radius:22px;
+      box-shadow: var(--shadow);
+      overflow:hidden;
+    }
+    .login-head{
+      padding:16px 16px 10px;
+      border-bottom:1px solid rgba(255,255,255,.10);
+      display:flex; align-items:center; gap:12px;
+    }
+    .login-head img{width:44px;height:44px;border-radius:14px;object-fit:cover}
+    .login-head b{font-size:15px}
+    .login-body{padding:14px 16px 16px}
+
+    /* MODAL */
+    .modal{
+      position:fixed; inset:0;
+      background: rgba(0,0,0,.55);
+      display:none;
+      align-items:center;
+      justify-content:center;
+      padding:18px;
+      z-index:50;
+    }
+    .modal.show{display:flex}
+    .modal .box{
+      width:min(720px,100%);
+      border-radius:22px;
+      border:1px solid rgba(255,255,255,.14);
+      background: #0f1730;
+      box-shadow: var(--shadow);
+      overflow:hidden;
+    }
+    .modal .head{
+      padding:14px 16px;
+      display:flex; justify-content:space-between; align-items:center;
+      border-bottom:1px solid rgba(255,255,255,.10);
+    }
+    .modal .head b{font-size:14px}
+    .modal .content{padding:14px 16px 16px}
+    .modal .foot{
+      padding:14px 16px;
+      display:flex; gap:10px; justify-content:flex-end;
+      border-top:1px solid rgba(255,255,255,.10)
+    }
+    .x{background:transparent;border:0;color:var(--muted);cursor:pointer;font-size:22px;line-height:1}
+    .row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    @media (max-width:700px){.row2{grid-template-columns:1fr}}
+
+    .hide{display:none}
   </style>
 
   <!-- JSZip -->
@@ -102,7 +204,8 @@
 
 <body>
 
-<div class="topbar">
+<!-- TOPBAR (muncul setelah login) -->
+<div class="topbar hide" id="topbar">
   <div class="brand">
     <img src="https://i.ibb.co.com/kgNGgsgf/Screenshot-2025-12-23-062333.png" alt="Logo">
     <div>
@@ -112,70 +215,529 @@
   </div>
 
   <div class="top-actions">
-    <!-- ROOT MODE: pakai relative -->
     <a class="btn" href="../">⬅ Beranda</a>
-    <button class="btn primary" id="btnDownloadZip">⬇ Download ZIP</button>
+    <button class="btn" id="btnLogout">Keluar</button>
+    <button class="btn" id="btnChangeCred">Ganti Username/Password</button>
+    <button class="btn primary" id="btnDownloadZip">⬇ Download ZIP Update</button>
   </div>
 </div>
 
-<div class="wrap">
-  <div class="panel">
-    <h2>Daftar PDF</h2>
-    <div class="body">
-      <div class="list" id="list">Loading…</div>
+<!-- LOGIN -->
+<div class="login-wrap" id="loginWrap">
+  <div class="login-card">
+    <div class="login-head">
+      <img src="https://i.ibb.co.com/kgNGgsgf/Screenshot-2025-12-23-062333.png" alt="Logo">
+      <div>
+        <b>Login Admin</b>
+        <div style="color:var(--muted);font-size:12px;margin-top:2px">Masuk untuk kelola katalog PDF</div>
+      </div>
+    </div>
+    <div class="login-body">
+      <div class="field">
+        <label>Username</label>
+        <input id="loginUser" type="text" placeholder="admin" autocomplete="username">
+      </div>
+      <div class="field">
+        <label>Password</label>
+        <input id="loginPass" type="password" placeholder="••••••••" autocomplete="current-password">
+      </div>
+      <button class="btn primary" id="btnLogin" style="width:100%;justify-content:center">Masuk</button>
+      <p class="hint" style="margin-top:10px">
+        Catatan: karena hosting statis, perubahan (termasuk password) akan berlaku publik setelah kamu
+        <b>Download ZIP Update</b> lalu upload isi ZIP ke repo GitHub.
+      </p>
+    </div>
+  </div>
+</div>
+
+<!-- DASHBOARD (muncul setelah login) -->
+<div class="wrap hide" id="dash">
+  <div class="grid">
+    <!-- LIST -->
+    <div class="panel">
+      <div class="toolbar">
+        <input id="q" type="search" placeholder="Cari judul…" />
+        <span class="pill" id="pillState"><i></i><span>Belum ada perubahan</span></span>
+      </div>
+
+      <h2>Daftar PDF</h2>
+      <div class="body">
+        <div class="list" id="list"></div>
+        <p class="hint" style="margin-top:10px">
+          Setelah selesai edit, klik <b>Download ZIP Update</b> lalu upload isi ZIP ke repo GitHub.
+        </p>
+      </div>
+    </div>
+
+    <!-- FORM TAMBAH -->
+    <div class="panel">
+      <h2>Tambah / Upload PDF</h2>
+      <div class="body">
+        <div class="field">
+          <label>Judul</label>
+          <input id="inTitle" type="text" placeholder="Misal: Proposal 2025" />
+        </div>
+
+        <div class="field">
+          <label>Kategori (opsional)</label>
+          <input id="inCategory" type="text" placeholder="Misal: Umum / Keuangan / Legal" />
+        </div>
+
+        <div class="field">
+          <label>Deskripsi (opsional)</label>
+          <textarea id="inDesc" rows="3" placeholder="Ringkas isi dokumen..."></textarea>
+        </div>
+
+        <div class="field">
+          <label>File PDF (opsional upload)</label>
+          <input id="inFile" type="file" accept="application/pdf" />
+          <p class="hint" style="margin-top:6px">
+            Kalau upload, file masuk ke folder <b>/pdf</b> saat download ZIP.
+          </p>
+        </div>
+
+        <div class="field">
+          <label>URL PDF (opsional manual)</label>
+          <input id="inUrl" type="text" placeholder="pdf/nama.pdf atau https://..." />
+          <p class="hint" style="margin-top:6px">Kalau upload file, URL otomatis diisi.</p>
+        </div>
+
+        <button class="btn primary" id="btnAdd">+ Tambah ke daftar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL EDIT ITEM -->
+<div class="modal" id="modalEdit">
+  <div class="box">
+    <div class="head">
+      <b>Edit item</b>
+      <button class="x" id="btnCloseEdit" aria-label="Close">×</button>
+    </div>
+    <div class="content">
+      <div class="field">
+        <label>Judul</label>
+        <input id="edTitle" type="text" />
+      </div>
+      <div class="field">
+        <label>Kategori</label>
+        <input id="edCategory" type="text" />
+      </div>
+      <div class="field">
+        <label>Deskripsi</label>
+        <textarea id="edDesc" rows="3"></textarea>
+      </div>
+      <div class="field">
+        <label>URL (pdf/nama.pdf atau link https://…)</label>
+        <input id="edUrl" type="text" />
+      </div>
+      <p class="hint">Kalau file ada di repo, formatnya biasanya: <b>pdf/nama-file.pdf</b>.</p>
+    </div>
+    <div class="foot">
+      <button class="btn danger" id="btnDelete">Hapus</button>
+      <button class="btn primary" id="btnSaveEdit">Simpan</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL GANTI CREDENTIAL -->
+<div class="modal" id="modalCred">
+  <div class="box">
+    <div class="head">
+      <b>Ganti Username / Password</b>
+      <button class="x" id="btnCloseCred" aria-label="Close">×</button>
+    </div>
+    <div class="content">
+      <div class="row2">
+        <div class="field">
+          <label>Username baru</label>
+          <input id="newUser" type="text" placeholder="admin" />
+        </div>
+        <div class="field">
+          <label>Password baru</label>
+          <input id="newPass" type="password" placeholder="minimal 6 karakter" />
+        </div>
+      </div>
+      <p class="hint" style="margin-top:8px">
+        Setelah kamu ganti username/password, klik <b>Download ZIP Update</b> dan upload ZIP ke GitHub supaya perubahan berlaku publik.
+      </p>
+    </div>
+    <div class="foot">
+      <button class="btn" id="btnSaveCred">Simpan</button>
     </div>
   </div>
 </div>
 
 <script>
-  async function loadData(){
-    try{
-      const res = await fetch("../data/pdfs.json?_=" + Date.now());
-      const data = await res.json();
-      const list = document.getElementById("list");
-      list.innerHTML = "";
+  // =============================
+  //  STORAGE (admin.json)
+  // =============================
+  // Default credential kalau data/admin.json belum ada
+  const DEFAULT_ADMIN = { username: "admin", password: "admin123" };
 
-      (data.items || []).forEach(it => {
-        const row = document.createElement("div");
-        row.className = "item";
+  // =============================
+  //  STATE
+  // =============================
+  let data = { updatedAt: null, items: [] };
+  let admin = { ...DEFAULT_ADMIN };
 
-        const left = document.createElement("div");
-        left.className = "meta";
-        left.innerHTML = `
-          <b>${it.title || "Tanpa judul"}</b>
-          <small>${it.url || ""}</small>
-        `;
+  let dirty = false;
+  const stagedFiles = new Map(); // filename -> File
+  let editingIndex = -1;
 
-        const open = document.createElement("a");
-        open.className = "btn";
-        open.target = "_blank";
-        open.rel = "noopener";
+  // =============================
+  //  DOM
+  // =============================
+  const topbar = document.getElementById("topbar");
+  const loginWrap = document.getElementById("loginWrap");
+  const dash = document.getElementById("dash");
 
-        // Kalau url = "pdf/nama.pdf", dari /admin/ harus jadi "../pdf/nama.pdf"
-        if (it.url) {
-          open.href = it.url.startsWith("http") ? it.url : "../" + it.url;
-          open.textContent = "Buka";
-        } else {
-          open.href = "#";
-          open.textContent = "Buka";
-          open.style.opacity = ".5";
-          open.style.pointerEvents = "none";
-        }
+  const loginUser = document.getElementById("loginUser");
+  const loginPass = document.getElementById("loginPass");
+  const btnLogin = document.getElementById("btnLogin");
 
-        row.appendChild(left);
-        row.appendChild(open);
-        list.appendChild(row);
-      });
+  const btnLogout = document.getElementById("btnLogout");
+  const btnDownloadZip = document.getElementById("btnDownloadZip");
+  const btnChangeCred = document.getElementById("btnChangeCred");
 
-      if (!(data.items || []).length) {
-        list.innerHTML = "<div style='color:#a1a1aa'>Belum ada data.</div>";
-      }
-    } catch(e){
-      document.getElementById("list").innerHTML = "Gagal memuat data.";
+  const listEl = document.getElementById("list");
+  const qEl = document.getElementById("q");
+  const pill = document.getElementById("pillState");
+  const pillDot = pill.querySelector("i");
+  const pillText = pill.querySelector("span");
+
+  const inTitle = document.getElementById("inTitle");
+  const inCategory = document.getElementById("inCategory");
+  const inDesc = document.getElementById("inDesc");
+  const inFile = document.getElementById("inFile");
+  const inUrl = document.getElementById("inUrl");
+  const btnAdd = document.getElementById("btnAdd");
+
+  // modal edit
+  const modalEdit = document.getElementById("modalEdit");
+  const btnCloseEdit = document.getElementById("btnCloseEdit");
+  const edTitle = document.getElementById("edTitle");
+  const edCategory = document.getElementById("edCategory");
+  const edDesc = document.getElementById("edDesc");
+  const edUrl = document.getElementById("edUrl");
+  const btnSaveEdit = document.getElementById("btnSaveEdit");
+  const btnDelete = document.getElementById("btnDelete");
+
+  // modal cred
+  const modalCred = document.getElementById("modalCred");
+  const btnCloseCred = document.getElementById("btnCloseCred");
+  const newUser = document.getElementById("newUser");
+  const newPass = document.getElementById("newPass");
+  const btnSaveCred = document.getElementById("btnSaveCred");
+
+  // =============================
+  //  HELPERS
+  // =============================
+  function setDirty(v){
+    dirty = v;
+    if (dirty){
+      pillDot.style.background = "var(--warn)";
+      pillText.textContent = "Ada perubahan (belum diunduh)";
+    } else {
+      pillDot.style.background = "var(--ok)";
+      pillText.textContent = "Belum ada perubahan";
     }
   }
 
-  loadData();
+  function safeName(name){
+    return (name || "file.pdf")
+      .trim()
+      .replace(/\s+/g, "-")
+      .replace(/[^a-zA-Z0-9._-]/g, "")
+      .replace(/-+/g, "-");
+  }
+
+  function openModal(el){ el.classList.add("show"); }
+  function closeModal(el){ el.classList.remove("show"); }
+
+  function requireLoginUI(){
+    loginWrap.classList.remove("hide");
+    dash.classList.add("hide");
+    topbar.classList.add("hide");
+  }
+  function showDashUI(){
+    loginWrap.classList.add("hide");
+    dash.classList.remove("hide");
+    topbar.classList.remove("hide");
+  }
+
+  function render(){
+    const q = (qEl.value || "").toLowerCase().trim();
+    const items = (data.items || []).filter(it =>
+      (it.title || "").toLowerCase().includes(q) ||
+      (it.category || "").toLowerCase().includes(q)
+    );
+
+    listEl.innerHTML = "";
+    if (!items.length){
+      const p = document.createElement("p");
+      p.className = "hint";
+      p.textContent = q ? "Nggak ketemu. Coba kata kunci lain." : "Belum ada data. Tambah item di panel kanan.";
+      listEl.appendChild(p);
+      return;
+    }
+
+    items.forEach((it) => {
+      const idx = data.items.indexOf(it);
+
+      const row = document.createElement("div");
+      row.className = "item";
+
+      const left = document.createElement("div");
+      left.className = "meta";
+      left.innerHTML = `
+        <b>${it.title || "Tanpa judul"}</b>
+        <small>${it.category ? "🏷️ " + it.category + " • " : ""}${it.url ? it.url : "<i>(belum ada URL)</i>"}</small>
+      `;
+
+      const right = document.createElement("div");
+      right.style.display = "flex";
+      right.style.gap = "8px";
+      right.style.alignItems = "center";
+
+      const open = document.createElement("a");
+      open.className = "btn";
+      open.target = "_blank";
+      open.rel = "noopener";
+      open.style.padding = "8px 10px";
+      open.style.borderRadius = "12px";
+
+      if (it.url){
+        // di admin, kalau url "pdf/.." harus jadi "../pdf/.."
+        open.href = it.url.startsWith("http") ? it.url : ("../" + it.url.replace(/^\/+/, ""));
+        open.textContent = "Buka";
+      } else {
+        open.href = "#";
+        open.textContent = "Buka";
+        open.style.opacity = ".5";
+        open.style.pointerEvents = "none";
+      }
+
+      const edit = document.createElement("button");
+      edit.className = "btn";
+      edit.textContent = "Edit";
+      edit.style.padding = "8px 10px";
+      edit.style.borderRadius = "12px";
+      edit.addEventListener("click", () => openEdit(idx));
+
+      right.appendChild(open);
+      right.appendChild(edit);
+
+      row.appendChild(left);
+      row.appendChild(right);
+      listEl.appendChild(row);
+    });
+  }
+
+  // =============================
+  //  LOAD DATA
+  // =============================
+  async function loadAdmin(){
+    try{
+      const res = await fetch("../data/admin.json?_=" + Date.now());
+      const a = await res.json();
+      if (a && typeof a.username === "string" && typeof a.password === "string"){
+        admin = a;
+      }
+    }catch(e){
+      admin = { ...DEFAULT_ADMIN };
+    }
+  }
+
+  async function loadPdfs(){
+    try{
+      const res = await fetch("../data/pdfs.json?_=" + Date.now());
+      const j = await res.json();
+      if (Array.isArray(j)) {
+        data = { updatedAt: null, items: j };
+      } else {
+        data = j || { updatedAt: null, items: [] };
+        if (!Array.isArray(data.items)) data.items = [];
+      }
+      setDirty(false);
+      render();
+    } catch(e){
+      data = { updatedAt: null, items: [] };
+      setDirty(false);
+      render();
+    }
+  }
+
+  // =============================
+  //  LOGIN
+  // =============================
+  function tryLogin(){
+    const u = (loginUser.value || "").trim();
+    const p = (loginPass.value || "").trim();
+    if (u === admin.username && p === admin.password){
+      sessionStorage.setItem("admin_logged_in", "1");
+      showDashUI();
+      render();
+    } else {
+      alert("Username / password salah!");
+    }
+  }
+
+  function logout(){
+    sessionStorage.removeItem("admin_logged_in");
+    requireLoginUI();
+  }
+
+  // =============================
+  //  EDIT MODAL
+  // =============================
+  function openEdit(idx){
+    editingIndex = idx;
+    const it = data.items[idx] || {};
+    edTitle.value = it.title || "";
+    edCategory.value = it.category || "";
+    edDesc.value = it.desc || "";
+    edUrl.value = it.url || "";
+    openModal(modalEdit);
+  }
+
+  function closeEdit(){
+    closeModal(modalEdit);
+    editingIndex = -1;
+  }
+
+  // =============================
+  //  EVENTS
+  // =============================
+  qEl.addEventListener("input", render);
+
+  btnLogin.addEventListener("click", tryLogin);
+  loginPass.addEventListener("keydown", (e)=>{ if(e.key==="Enter") tryLogin(); });
+
+  btnLogout.addEventListener("click", logout);
+
+  btnChangeCred.addEventListener("click", () => {
+    newUser.value = admin.username || "";
+    newPass.value = "";
+    openModal(modalCred);
+  });
+  btnCloseCred.addEventListener("click", () => closeModal(modalCred));
+
+  btnSaveCred.addEventListener("click", () => {
+    const u = (newUser.value || "").trim();
+    const p = (newPass.value || "").trim();
+
+    if (!u || !p){
+      alert("Username & password baru harus diisi.");
+      return;
+    }
+    if (p.length < 6){
+      alert("Password minimal 6 karakter.");
+      return;
+    }
+
+    admin = { username: u, password: p };
+    setDirty(true);
+    closeModal(modalCred);
+    alert("Berhasil! Jangan lupa klik Download ZIP Update lalu upload ke GitHub.");
+  });
+
+  btnCloseEdit.addEventListener("click", closeEdit);
+
+  btnSaveEdit.addEventListener("click", () => {
+    if (editingIndex < 0) return;
+    data.items[editingIndex].title = (edTitle.value || "").trim();
+    data.items[editingIndex].category = (edCategory.value || "").trim();
+    data.items[editingIndex].desc = (edDesc.value || "").trim();
+    data.items[editingIndex].url = (edUrl.value || "").trim();
+    setDirty(true);
+    closeEdit();
+    render();
+  });
+
+  btnDelete.addEventListener("click", () => {
+    if (editingIndex < 0) return;
+    if (!confirm("Yakin mau hapus item ini?")) return;
+    data.items.splice(editingIndex, 1);
+    setDirty(true);
+    closeEdit();
+    render();
+  });
+
+  // Tambah + upload
+  btnAdd.addEventListener("click", () => {
+    const title = (inTitle.value || "").trim();
+    const category = (inCategory.value || "").trim();
+    const desc = (inDesc.value || "").trim();
+    const file = inFile.files[0];
+    let url = (inUrl.value || "").trim();
+
+    if (!title){
+      alert("Judul masih kosong.");
+      return;
+    }
+
+    if (file){
+      const fname = safeName(file.name);
+      stagedFiles.set(fname, file);
+      url = "pdf/" + fname; // disimpan relatif untuk beranda
+    }
+
+    data.items.push({ title, category, desc, url });
+
+    inTitle.value = "";
+    inCategory.value = "";
+    inDesc.value = "";
+    inFile.value = "";
+    inUrl.value = "";
+
+    setDirty(true);
+    render();
+  });
+
+  // =============================
+  //  DOWNLOAD ZIP UPDATE
+  // =============================
+  btnDownloadZip.addEventListener("click", async () => {
+    // update timestamp
+    data.updatedAt = new Date().toISOString();
+
+    const zip = new JSZip();
+
+    // file data
+    zip.file("data/pdfs.json", JSON.stringify(data, null, 2));
+    zip.file("data/admin.json", JSON.stringify(admin, null, 2));
+
+    // pdf folder (upload)
+    const pdfFolder = zip.folder("pdf");
+    stagedFiles.forEach((file, name) => {
+      pdfFolder.file(name, file);
+    });
+
+    // generate zip
+    const blob = await zip.generateAsync({ type: "blob" });
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = "update-admin-katalog.zip";
+    a.click();
+
+    setDirty(false);
+    stagedFiles.clear();
+    alert("ZIP berhasil dibuat. Upload isi ZIP ke repo GitHub (replace file lama).");
+  });
+
+  // =============================
+  //  INIT
+  // =============================
+  (async function init(){
+    await loadAdmin();
+    await loadPdfs();
+
+    const logged = sessionStorage.getItem("admin_logged_in") === "1";
+    if (logged) showDashUI();
+    else requireLoginUI();
+  })();
 </script>
 
 </body>
