@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Admin • Kelola PDF</title>
 
-  <!-- FAVICON -->
   <link rel="icon" type="image/png" href="https://i.ibb.co.com/kgNGgsgf/Screenshot-2025-12-23-062333.png">
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -20,7 +19,6 @@
       --primary:#7c3aed; --primary2:#6d28d9;
       --shadow: 0 20px 60px rgba(0,0,0,.45);
       --ok:#22c55e; --warn:#f59e0b; --bad:#ef4444;
-      --card: rgba(255,255,255,.06);
     }
     *{box-sizing:border-box;margin:0;padding:0}
     body{
@@ -129,7 +127,7 @@
 
     .field{margin-bottom:10px}
     .field label{font-size:12px; color:var(--muted); display:block; margin-bottom:6px}
-    .field input, .field textarea, .field select{
+    .field input, .field textarea{
       width:100%;
       padding:11px 12px;
       border-radius:14px;
@@ -141,9 +139,7 @@
     .hint{font-size:12px; color:var(--muted); line-height:1.5}
 
     /* LOGIN */
-    .login-wrap{
-      max-width:540px; margin:50px auto 0; padding:18px;
-    }
+    .login-wrap{max-width:540px; margin:50px auto 0; padding:18px;}
     .login-card{
       background: linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.05));
       border:1px solid var(--border);
@@ -198,7 +194,6 @@
     .hide{display:none}
   </style>
 
-  <!-- JSZip -->
   <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
 </head>
 
@@ -215,10 +210,16 @@
   </div>
 
   <div class="top-actions">
-    <a class="btn" href="../">⬅ Beranda</a>
+    <a class="btn" href="../">🏠 Halaman Utama</a>
+
     <button class="btn" id="btnLogout">Keluar</button>
     <button class="btn" id="btnChangeCred">Ganti Username/Password</button>
-    <button class="btn primary" id="btnDownloadZip">⬇ Download ZIP Update</button>
+
+    <!-- TOMBOL SAVE (buat ZIP) -->
+    <button class="btn primary" id="btnSave">💾 Save</button>
+
+    <!-- SAVE + BALIK KE BERANDA -->
+    <button class="btn primary" id="btnSaveGoHome">💾 Save & Beranda</button>
   </div>
 </div>
 
@@ -243,20 +244,20 @@
       </div>
       <button class="btn primary" id="btnLogin" style="width:100%;justify-content:center">Masuk</button>
       <p class="hint" style="margin-top:10px">
-        Catatan: karena hosting statis, perubahan (termasuk password) akan berlaku publik setelah kamu
-        <b>Download ZIP Update</b> lalu upload isi ZIP ke repo GitHub.
+        Hosting statis: tombol <b>Save</b> akan membuat file <b>ZIP Update</b>.
+        Setelah itu upload isi ZIP ke repo GitHub supaya perubahan tampil di beranda.
       </p>
     </div>
   </div>
 </div>
 
-<!-- DASHBOARD (muncul setelah login) -->
+<!-- DASHBOARD -->
 <div class="wrap hide" id="dash">
   <div class="grid">
     <!-- LIST -->
     <div class="panel">
       <div class="toolbar">
-        <input id="q" type="search" placeholder="Cari judul…" />
+        <input id="q" type="search" placeholder="Cari judul / kategori…" />
         <span class="pill" id="pillState"><i></i><span>Belum ada perubahan</span></span>
       </div>
 
@@ -264,7 +265,7 @@
       <div class="body">
         <div class="list" id="list"></div>
         <p class="hint" style="margin-top:10px">
-          Setelah selesai edit, klik <b>Download ZIP Update</b> lalu upload isi ZIP ke repo GitHub.
+          Klik <b>Save</b> untuk download ZIP update, lalu upload ke GitHub.
         </p>
       </div>
     </div>
@@ -292,14 +293,13 @@
           <label>File PDF (opsional upload)</label>
           <input id="inFile" type="file" accept="application/pdf" />
           <p class="hint" style="margin-top:6px">
-            Kalau upload, file masuk ke folder <b>/pdf</b> saat download ZIP.
+            Kalau upload, file masuk ke folder <b>/pdf</b> saat Save (ZIP).
           </p>
         </div>
 
         <div class="field">
           <label>URL PDF (opsional manual)</label>
           <input id="inUrl" type="text" placeholder="pdf/nama.pdf atau https://..." />
-          <p class="hint" style="margin-top:6px">Kalau upload file, URL otomatis diisi.</p>
         </div>
 
         <button class="btn primary" id="btnAdd">+ Tambah ke daftar</button>
@@ -329,10 +329,10 @@
         <textarea id="edDesc" rows="3"></textarea>
       </div>
       <div class="field">
-        <label>URL (pdf/nama.pdf atau link https://…)</label>
+        <label>URL</label>
         <input id="edUrl" type="text" />
       </div>
-      <p class="hint">Kalau file ada di repo, formatnya biasanya: <b>pdf/nama-file.pdf</b>.</p>
+      <p class="hint">Kalau file ada di repo: <b>pdf/nama-file.pdf</b>.</p>
     </div>
     <div class="foot">
       <button class="btn danger" id="btnDelete">Hapus</button>
@@ -360,7 +360,7 @@
         </div>
       </div>
       <p class="hint" style="margin-top:8px">
-        Setelah kamu ganti username/password, klik <b>Download ZIP Update</b> dan upload ZIP ke GitHub supaya perubahan berlaku publik.
+        Perubahan akun ikut tersimpan saat kamu klik <b>Save</b> (ZIP).
       </p>
     </div>
     <div class="foot">
@@ -370,25 +370,15 @@
 </div>
 
 <script>
-  // =============================
-  //  STORAGE (admin.json)
-  // =============================
-  // Default credential kalau data/admin.json belum ada
   const DEFAULT_ADMIN = { username: "admin", password: "admin123" };
 
-  // =============================
-  //  STATE
-  // =============================
   let data = { updatedAt: null, items: [] };
   let admin = { ...DEFAULT_ADMIN };
 
   let dirty = false;
-  const stagedFiles = new Map(); // filename -> File
+  const stagedFiles = new Map();
   let editingIndex = -1;
 
-  // =============================
-  //  DOM
-  // =============================
   const topbar = document.getElementById("topbar");
   const loginWrap = document.getElementById("loginWrap");
   const dash = document.getElementById("dash");
@@ -398,8 +388,10 @@
   const btnLogin = document.getElementById("btnLogin");
 
   const btnLogout = document.getElementById("btnLogout");
-  const btnDownloadZip = document.getElementById("btnDownloadZip");
   const btnChangeCred = document.getElementById("btnChangeCred");
+
+  const btnSave = document.getElementById("btnSave");
+  const btnSaveGoHome = document.getElementById("btnSaveGoHome");
 
   const listEl = document.getElementById("list");
   const qEl = document.getElementById("q");
@@ -414,7 +406,6 @@
   const inUrl = document.getElementById("inUrl");
   const btnAdd = document.getElementById("btnAdd");
 
-  // modal edit
   const modalEdit = document.getElementById("modalEdit");
   const btnCloseEdit = document.getElementById("btnCloseEdit");
   const edTitle = document.getElementById("edTitle");
@@ -424,21 +415,17 @@
   const btnSaveEdit = document.getElementById("btnSaveEdit");
   const btnDelete = document.getElementById("btnDelete");
 
-  // modal cred
   const modalCred = document.getElementById("modalCred");
   const btnCloseCred = document.getElementById("btnCloseCred");
   const newUser = document.getElementById("newUser");
   const newPass = document.getElementById("newPass");
   const btnSaveCred = document.getElementById("btnSaveCred");
 
-  // =============================
-  //  HELPERS
-  // =============================
   function setDirty(v){
     dirty = v;
     if (dirty){
       pillDot.style.background = "var(--warn)";
-      pillText.textContent = "Ada perubahan (belum diunduh)";
+      pillText.textContent = "Ada perubahan (belum di-Save)";
     } else {
       pillDot.style.background = "var(--ok)";
       pillText.textContent = "Belum ada perubahan";
@@ -509,7 +496,6 @@
       open.style.borderRadius = "12px";
 
       if (it.url){
-        // di admin, kalau url "pdf/.." harus jadi "../pdf/.."
         open.href = it.url.startsWith("http") ? it.url : ("../" + it.url.replace(/^\/+/, ""));
         open.textContent = "Buka";
       } else {
@@ -535,9 +521,6 @@
     });
   }
 
-  // =============================
-  //  LOAD DATA
-  // =============================
   async function loadAdmin(){
     try{
       const res = await fetch("../data/admin.json?_=" + Date.now());
@@ -554,9 +537,8 @@
     try{
       const res = await fetch("../data/pdfs.json?_=" + Date.now());
       const j = await res.json();
-      if (Array.isArray(j)) {
-        data = { updatedAt: null, items: j };
-      } else {
+      if (Array.isArray(j)) data = { updatedAt: null, items: j };
+      else {
         data = j || { updatedAt: null, items: [] };
         if (!Array.isArray(data.items)) data.items = [];
       }
@@ -569,9 +551,6 @@
     }
   }
 
-  // =============================
-  //  LOGIN
-  // =============================
   function tryLogin(){
     const u = (loginUser.value || "").trim();
     const p = (loginPass.value || "").trim();
@@ -589,9 +568,6 @@
     requireLoginUI();
   }
 
-  // =============================
-  //  EDIT MODAL
-  // =============================
   function openEdit(idx){
     editingIndex = idx;
     const it = data.items[idx] || {};
@@ -607,9 +583,6 @@
     editingIndex = -1;
   }
 
-  // =============================
-  //  EVENTS
-  // =============================
   qEl.addEventListener("input", render);
 
   btnLogin.addEventListener("click", tryLogin);
@@ -628,19 +601,13 @@
     const u = (newUser.value || "").trim();
     const p = (newPass.value || "").trim();
 
-    if (!u || !p){
-      alert("Username & password baru harus diisi.");
-      return;
-    }
-    if (p.length < 6){
-      alert("Password minimal 6 karakter.");
-      return;
-    }
+    if (!u || !p){ alert("Username & password baru harus diisi."); return; }
+    if (p.length < 6){ alert("Password minimal 6 karakter."); return; }
 
     admin = { username: u, password: p };
     setDirty(true);
     closeModal(modalCred);
-    alert("Berhasil! Jangan lupa klik Download ZIP Update lalu upload ke GitHub.");
+    alert("Akun admin berhasil diganti. Klik Save supaya tersimpan ke ZIP.");
   });
 
   btnCloseEdit.addEventListener("click", closeEdit);
@@ -665,7 +632,6 @@
     render();
   });
 
-  // Tambah + upload
   btnAdd.addEventListener("click", () => {
     const title = (inTitle.value || "").trim();
     const category = (inCategory.value || "").trim();
@@ -673,15 +639,12 @@
     const file = inFile.files[0];
     let url = (inUrl.value || "").trim();
 
-    if (!title){
-      alert("Judul masih kosong.");
-      return;
-    }
+    if (!title){ alert("Judul masih kosong."); return; }
 
     if (file){
       const fname = safeName(file.name);
       stagedFiles.set(fname, file);
-      url = "pdf/" + fname; // disimpan relatif untuk beranda
+      url = "pdf/" + fname;
     }
 
     data.items.push({ title, category, desc, url });
@@ -696,26 +659,19 @@
     render();
   });
 
-  // =============================
-  //  DOWNLOAD ZIP UPDATE
-  // =============================
-  btnDownloadZip.addEventListener("click", async () => {
-    // update timestamp
+  async function makeZipAndDownload(){
+    // kalau gak ada perubahan, tetap boleh save buat nyimpen admin.json juga
     data.updatedAt = new Date().toISOString();
 
     const zip = new JSZip();
-
-    // file data
     zip.file("data/pdfs.json", JSON.stringify(data, null, 2));
     zip.file("data/admin.json", JSON.stringify(admin, null, 2));
 
-    // pdf folder (upload)
     const pdfFolder = zip.folder("pdf");
     stagedFiles.forEach((file, name) => {
       pdfFolder.file(name, file);
     });
 
-    // generate zip
     const blob = await zip.generateAsync({ type: "blob" });
     const a = document.createElement("a");
     a.href = URL.createObjectURL(blob);
@@ -724,12 +680,19 @@
 
     setDirty(false);
     stagedFiles.clear();
-    alert("ZIP berhasil dibuat. Upload isi ZIP ke repo GitHub (replace file lama).");
+  }
+
+  btnSave.addEventListener("click", async () => {
+    await makeZipAndDownload();
+    alert("Saved! ZIP sudah ter-download. Upload isi ZIP ke GitHub supaya tampil di beranda.");
   });
 
-  // =============================
-  //  INIT
-  // =============================
+  btnSaveGoHome.addEventListener("click", async () => {
+    await makeZipAndDownload();
+    // langsung masuk ke halaman utama
+    window.location.href = "../";
+  });
+
   (async function init(){
     await loadAdmin();
     await loadPdfs();
