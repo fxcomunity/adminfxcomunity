@@ -3,19 +3,299 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Katalog PDF</title>
+  <title>Katalog PDF • FX Community</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
+
+  <!-- CSS kamu -->
   <link rel="stylesheet" href="assets/style.css" />
+
+  <!-- Estetik tambahan (tanpa ganggu CSS lama) -->
+  <style>
+    :root{
+      --bg1:#0b1220; --bg2:#151a33;
+      --glass: rgba(255,255,255,.06);
+      --border: rgba(255,255,255,.12);
+      --text:#e5e7eb; --muted:#a1a1aa;
+      --primary:#7c3aed; --primary2:#6d28d9;
+      --shadow: 0 24px 80px rgba(0,0,0,.45);
+    }
+
+    body{
+      font-family:"Plus Jakarta Sans",system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+      background:
+        radial-gradient(1200px 600px at 10% 10%, rgba(124,58,237,.28) 0%, transparent 60%),
+        radial-gradient(900px 500px at 90% 20%, rgba(59,130,246,.20) 0%, transparent 55%),
+        linear-gradient(135deg, var(--bg1), var(--bg2));
+      color:var(--text);
+      margin:0;
+      min-height:100vh;
+      overflow-x:hidden;
+    }
+
+    /* grid halus di background */
+    body:before{
+      content:"";
+      position:fixed;
+      inset:0;
+      background-image:
+        linear-gradient(to right, rgba(255,255,255,.05) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(255,255,255,.05) 1px, transparent 1px);
+      background-size: 52px 52px;
+      opacity:.06;
+      pointer-events:none;
+      z-index:-1;
+    }
+
+    /* NAVBAR */
+    header.nav{
+      position:sticky;
+      top:0;
+      z-index:50;
+      backdrop-filter: blur(14px);
+      background: rgba(0,0,0,.28);
+      border-bottom:1px solid var(--border);
+      padding:14px 18px;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+    }
+
+    .nav-left{
+      display:flex;
+      align-items:center;
+      gap:12px;
+    }
+
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:10px;
+    }
+
+    .brand .logo-badge{
+      width:42px;height:42px;border-radius:14px;
+      display:grid;place-items:center;
+      background: rgba(124,58,237,.20);
+      border:1px solid rgba(124,58,237,.35);
+      box-shadow: var(--shadow);
+      font-size:18px;
+    }
+
+    .brand .title{
+      display:flex;flex-direction:column;line-height:1.1;
+    }
+    .brand .title b{font-size:14px}
+    .brand .title span{font-size:12px;color:var(--muted);margin-top:3px}
+
+    .badge{
+      border:1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.06);
+      padding:6px 10px;
+      border-radius:999px;
+      font-size:12px;
+      color:var(--muted);
+    }
+
+    /* tombol biar konsisten estetik */
+    .btn{
+      border:1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.06);
+      color: var(--text);
+      padding:10px 12px;
+      border-radius:14px;
+      cursor:pointer;
+      font-weight:800;
+      text-decoration:none;
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      transition:.15s;
+      user-select:none;
+    }
+    .btn:hover{transform: translateY(-1px); border-color: rgba(124,58,237,.55)}
+    .btn.primary{
+      background: linear-gradient(135deg,var(--primary),var(--primary2));
+      border-color: transparent;
+    }
+    .btn.ghost{background: rgba(255,255,255,.04)}
+
+    /* HERO */
+    section.hero{
+      max-width:1100px;
+      margin:0 auto;
+      padding:54px 18px 16px;
+    }
+
+    .hero-inner{
+      background: linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.04));
+      border:1px solid rgba(255,255,255,.12);
+      border-radius:26px;
+      box-shadow: var(--shadow);
+      padding:26px 22px 18px;
+      position:relative;
+      overflow:hidden;
+    }
+
+    .hero-inner:before{
+      content:"";
+      position:absolute;
+      inset:-2px;
+      background:
+        radial-gradient(500px 220px at 15% 20%, rgba(124,58,237,.25), transparent 60%),
+        radial-gradient(520px 240px at 85% 10%, rgba(59,130,246,.20), transparent 60%);
+      opacity:.9;
+      pointer-events:none;
+    }
+
+    .hero-inner > *{position:relative}
+
+    .hero h1{
+      font-size:38px;
+      margin:0 0 8px;
+      font-weight:900;
+      letter-spacing:-.02em;
+    }
+    .hero p{margin:0 0 18px;color:var(--muted)}
+
+    .controls{
+      display:grid;
+      grid-template-columns: 1fr 220px auto;
+      gap:10px;
+      align-items:center;
+    }
+    @media (max-width: 860px){
+      .controls{grid-template-columns:1fr; }
+    }
+
+    /* input */
+    .input{
+      display:flex;align-items:center;gap:10px;
+      background: rgba(255,255,255,.06);
+      border:1px solid rgba(255,255,255,.14);
+      border-radius:16px;
+      padding:10px 12px;
+    }
+    .input .icon{opacity:.85}
+    .input input{
+      width:100%;
+      background: transparent;
+      border:0;
+      outline:none;
+      color: var(--text);
+      font-size:14px;
+    }
+
+    select.select{
+      width:100%;
+      background: rgba(255,255,255,.06);
+      border:1px solid rgba(255,255,255,.14);
+      border-radius:16px;
+      padding:11px 12px;
+      color: var(--text);
+      outline:none;
+    }
+
+    .meta{
+      display:flex;
+      gap:10px;
+      align-items:center;
+      margin-top:14px;
+      color: var(--muted);
+      font-size:13px;
+      flex-wrap:wrap;
+    }
+    .meta .pill{
+      display:inline-flex;
+      gap:8px;
+      align-items:center;
+      padding:7px 10px;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.05);
+    }
+    .dot{opacity:.6}
+
+    /* MAIN */
+    main.container{
+      max-width:1100px;
+      margin:0 auto;
+      padding:18px 18px 64px;
+    }
+
+    .section-title{
+      margin:14px 0 14px;
+      font-size:15px;
+      font-weight:900;
+      color: var(--text);
+    }
+
+    /* grid list tetap pakai class dari kamu */
+    #list.grid{
+      display:grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap:16px;
+    }
+
+    /* card umum (kalau app.js bikin .card) */
+    .card{
+      background: linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.05));
+      border:1px solid rgba(255,255,255,.14);
+      border-radius:22px;
+      padding:16px;
+      box-shadow: 0 20px 60px rgba(0,0,0,.35);
+    }
+    .card h3{margin:0 0 10px;font-size:14px;font-weight:900}
+    .card iframe{
+      width:100%;
+      height:420px;
+      border:0;
+      border-radius:16px;
+      background:#000;
+    }
+
+    .footer{
+      text-align:center;
+      padding:34px 18px 44px;
+      color: var(--muted);
+      font-size:13px;
+    }
+
+    /* empty */
+    .empty-card{
+      background: rgba(255,255,255,.05);
+      border:1px solid rgba(255,255,255,.12);
+      border-radius:22px;
+      padding:18px;
+    }
+
+    /* kecil */
+    @media(max-width:640px){
+      .hero h1{font-size:28px}
+      .card iframe{height:360px}
+    }
+  </style>
 </head>
+
 <body>
 
   <!-- Navbar -->
   <header class="nav">
     <div class="nav-left">
-      <span class="logo">📚 Katalog PDF</span>
+      <div class="brand">
+        <div class="logo-badge">📚</div>
+        <div class="title">
+          <b>Katalog PDF</b>
+          <span>FX Community • Dokumen Tersusun</span>
+        </div>
+      </div>
+
       <span class="badge">v1</span>
     </div>
 
-    <div class="nav-right">
+    <div class="nav-right" style="display:flex;gap:10px;align-items:center">
       <button id="toggleTheme" class="btn ghost" type="button" title="Dark mode">🌙</button>
       <a class="btn primary" href="admin/">Admin</a>
     </div>
@@ -41,9 +321,9 @@
       </div>
 
       <div class="meta">
-        <span id="count">0 dokumen</span>
+        <span class="pill">📄 <b id="count" style="color:#e5e7eb">0 dokumen</b></span>
         <span class="dot">•</span>
-        <span>Terakhir update: <span id="updatedAt">-</span></span>
+        <span class="pill">🕒 Terakhir update: <b id="updatedAt" style="color:#e5e7eb">-</b></span>
       </div>
     </div>
   </section>
@@ -57,8 +337,8 @@
     <div id="empty" class="empty hidden">
       <div class="empty-card">
         <div class="empty-icon">📭</div>
-        <div class="empty-title">Tidak ada hasil</div>
-        <div class="empty-sub">Coba ubah kata kunci atau kategori.</div>
+        <div class="empty-title" style="font-weight:900;margin:8px 0 4px">Tidak ada hasil</div>
+        <div class="empty-sub" style="color:#a1a1aa">Coba ubah kata kunci atau kategori.</div>
       </div>
     </div>
   </main>
