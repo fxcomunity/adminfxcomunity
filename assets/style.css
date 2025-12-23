@@ -145,7 +145,7 @@ header.nav{
   overflow:hidden;
 }
 
-/* soft glow (bukan bar biru norak) */
+/* soft glow */
 .hero-inner:before{
   content:"";
   position:absolute;
@@ -251,7 +251,7 @@ html[data-theme="light"] .hero-inner:before{
   font-weight:900;
 }
 
-/* LIST GRID (default) */
+/* LIST GRID */
 .grid{
   display:grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -318,20 +318,21 @@ html[data-theme="light"] .hero-inner:before{
 }
 
 /* =========================
-   LOGO IMAGE (HEADER)
+   LOGO IMAGE (HEADER) - FIX SIZE
    ========================= */
 .logo-img{
-  width:42px;
-  height:42px;
-  border-radius:14px;
-  object-fit:cover;
+  width:32px;
+  height:32px;
+  border-radius:8px;
+  object-fit:contain;
   border:1px solid var(--border);
-  background: var(--card2);
-  box-shadow: 0 8px 30px rgba(0,0,0,.25);
+  background: transparent;
+  box-shadow: none;
 }
+
 @media(max-width:640px){
   .logo-img{
-    width:36px;
-    height:36px;
+    width:28px;
+    height:28px;
   }
 }
