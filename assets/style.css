@@ -35,6 +35,7 @@ html[data-theme="light"]{
 }
 
 *{box-sizing:border-box}
+
 body{
   margin:0;
   font-family:"Plus Jakarta Sans",system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
@@ -82,11 +83,15 @@ header.nav{
 }
 
 .nav-left{display:flex;align-items:center;gap:12px}
+.nav-right{display:flex;gap:10px;align-items:center}
+
+/* versi text kalau dipakai */
 .logo{
   font-weight:900;
   letter-spacing:-.02em;
 }
 
+/* BADGE */
 .badge{
   border:1px solid var(--border);
   background: var(--card2);
@@ -95,8 +100,6 @@ header.nav{
   border-radius:999px;
   font-size:12px;
 }
-
-.nav-right{display:flex;gap:10px;align-items:center}
 
 /* BUTTON */
 .btn{
@@ -114,8 +117,15 @@ header.nav{
   transition:.15s;
   user-select:none;
 }
-.btn:hover{transform:translateY(-1px); border-color: color-mix(in oklab, var(--primary1) 45%, var(--border));}
-.btn.primary{background: linear-gradient(135deg,var(--primary1),var(--primary2)); border-color:transparent; color:#fff}
+.btn:hover{
+  transform:translateY(-1px);
+  border-color: color-mix(in oklab, var(--primary1) 45%, var(--border));
+}
+.btn.primary{
+  background: linear-gradient(135deg,var(--primary1),var(--primary2));
+  border-color:transparent;
+  color:#fff;
+}
 .btn.ghost{background: transparent}
 
 /* HERO */
@@ -135,7 +145,7 @@ header.nav{
   overflow:hidden;
 }
 
-/* INI yang kamu bilang “bar biru” → kita bikin lebih soft */
+/* soft glow (bukan bar biru norak) */
 .hero-inner:before{
   content:"";
   position:absolute;
@@ -160,8 +170,12 @@ html[data-theme="light"] .hero-inner:before{
   font-weight:900;
   letter-spacing:-.02em;
 }
-.hero p{margin:0 0 18px;color:var(--muted)}
+.hero p{
+  margin:0 0 18px;
+  color:var(--muted);
+}
 
+/* CONTROLS */
 .controls{
   display:grid;
   grid-template-columns: 1fr 220px auto;
@@ -173,7 +187,9 @@ html[data-theme="light"] .hero-inner:before{
 }
 
 .input{
-  display:flex;align-items:center;gap:10px;
+  display:flex;
+  align-items:center;
+  gap:10px;
   background: var(--card2);
   border:1px solid var(--border);
   border-radius:16px;
@@ -199,6 +215,7 @@ html[data-theme="light"] .hero-inner:before{
   outline:none;
 }
 
+/* META */
 .meta{
   display:flex;
   gap:10px;
@@ -219,23 +236,29 @@ html[data-theme="light"] .hero-inner:before{
   background: var(--card2);
 }
 
+.dot{opacity:.6}
+
+/* MAIN */
 .container{
   max-width:1100px;
   margin:0 auto;
   padding:18px 18px 64px;
 }
+
 .section-title{
   margin:14px 0 14px;
   font-size:15px;
   font-weight:900;
 }
 
+/* LIST GRID (default) */
 .grid{
   display:grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   gap:16px;
 }
 
+/* CARD */
 .card{
   background: linear-gradient(180deg, var(--card), var(--card2));
   border:1px solid var(--border);
@@ -244,8 +267,19 @@ html[data-theme="light"] .hero-inner:before{
   box-shadow: 0 18px 55px rgba(0,0,0,.22);
 }
 
-.card h3{margin:0 0 10px;font-size:14px;font-weight:900}
-.card .sub{color:var(--muted);font-size:13px;line-height:1.4;margin:-4px 0 12px}
+.card h3{
+  margin:0 0 10px;
+  font-size:14px;
+  font-weight:900;
+}
+
+.card .sub{
+  color:var(--muted);
+  font-size:13px;
+  line-height:1.4;
+  margin:-4px 0 12px;
+}
+
 .card iframe{
   width:100%;
   height:420px;
@@ -254,7 +288,9 @@ html[data-theme="light"] .hero-inner:before{
   background:#000;
 }
 
+/* EMPTY */
 .empty.hidden{display:none}
+
 .empty-card{
   background: var(--card2);
   border:1px solid var(--border);
@@ -262,10 +298,12 @@ html[data-theme="light"] .hero-inner:before{
   padding:18px;
   text-align:center;
 }
+
 .empty-icon{font-size:24px}
 .empty-title{font-weight:900;margin:8px 0 4px}
 .empty-sub{color:var(--muted)}
 
+/* FOOTER */
 .footer{
   text-align:center;
   padding:34px 18px 44px;
@@ -273,7 +311,27 @@ html[data-theme="light"] .hero-inner:before{
   font-size:13px;
 }
 
+/* RESPONSIVE */
 @media(max-width:640px){
   .hero h1{font-size:28px}
   .card iframe{height:360px}
+}
+
+/* =========================
+   LOGO IMAGE (HEADER)
+   ========================= */
+.logo-img{
+  width:42px;
+  height:42px;
+  border-radius:14px;
+  object-fit:cover;
+  border:1px solid var(--border);
+  background: var(--card2);
+  box-shadow: 0 8px 30px rgba(0,0,0,.25);
+}
+@media(max-width:640px){
+  .logo-img{
+    width:36px;
+    height:36px;
+  }
 }
