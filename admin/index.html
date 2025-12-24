@@ -81,6 +81,7 @@
       gap:8px;
       transition:.15s;
       user-select:none;
+      pointer-events:auto;
     }
     .btn:hover{transform: translateY(-1px); border-color: rgba(124,58,237,.55)}
     .btn.primary{background: linear-gradient(135deg,var(--primary),var(--primary2)); border-color:transparent}
@@ -170,26 +171,6 @@
       line-height:1.6;
       max-width: 55ch;
     }
-    .hero-points{
-      margin-top:18px;
-      display:grid;
-      gap:10px;
-    }
-    .point{
-      display:flex; gap:10px; align-items:flex-start;
-      padding:10px 12px;
-      border-radius:16px;
-      border:1px solid rgba(255,255,255,.12);
-      background: rgba(255,255,255,.05);
-    }
-    .point b{font-size:13px}
-    .point span{display:block;font-size:12px;color:var(--muted);margin-top:2px;line-height:1.4}
-    .dot{
-      width:10px;height:10px;border-radius:999px;
-      background: rgba(124,58,237,.9);
-      box-shadow: 0 0 0 4px rgba(124,58,237,.14);
-      margin-top:4px;
-    }
 
     /* FORM */
     .row{display:grid; gap:10px}
@@ -201,7 +182,6 @@
       border:1px solid rgba(255,255,255,.16);
       background: rgba(255,255,255,.06);
     }
-    .control .icon{opacity:.9}
     .control input{
       width:100%;
       border:0; outline:none;
@@ -293,7 +273,7 @@
     }
   </style>
 
-  <!-- Supabase JS (CDN) -->
+  <!-- Supabase JS -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 
@@ -310,56 +290,25 @@
 
   <div class="top-actions">
     <a class="btn" href="../">⬅ Beranda</a>
-    <button class="btn danger hidden" id="btnLogout">Logout</button>
+    <button class="btn danger hidden" id="btnLogout" type="button">Logout</button>
   </div>
 </div>
 
 <div class="wrap">
 
-  <!-- LOGIN (MEWAH) -->
+  <!-- LOGIN -->
   <div class="login-shell" id="loginPanel">
-
-    <!-- Left: hero -->
     <div class="hero-card">
       <div class="kicker"><i></i> Secure Admin Access</div>
       <h1>Masuk Admin<br/>dengan aman & elegan.</h1>
       <p>
-        Panel ini pakai <b>Supabase Auth</b>, jadi password tersimpan aman (bukan di localStorage).
-        Kamu bisa login, logout, dan ganti password langsung dari sini.
+        Panel ini pakai <b>Supabase Auth</b>. Password tersimpan aman di server Supabase.
+        Kamu bisa login, logout, dan ganti password langsung dari dashboard.
       </p>
-
-      <div class="hero-points">
-        <div class="point">
-          <div class="dot"></div>
-          <div>
-            <b>Login beneran</b>
-            <span>Email & password diverifikasi oleh Supabase.</span>
-          </div>
-        </div>
-        <div class="point">
-          <div class="dot"></div>
-          <div>
-            <b>Ganti password</b>
-            <span>Update password akun admin tanpa edit kode.</span>
-          </div>
-        </div>
-        <div class="point">
-          <div class="dot"></div>
-          <div>
-            <b>Kontrol admin</b>
-            <span>Bisa batasi hanya email tertentu (opsional).</span>
-          </div>
-        </div>
-      </div>
     </div>
 
-    <!-- Right: form -->
     <div class="panel">
-      <h2>
-        Login Admin
-        <span class="mini" title="Status koneksi">🔐 Auth</span>
-      </h2>
-
+      <h2>Login Admin <span class="mini">🔐 Auth</span></h2>
       <div class="body">
         <div class="row">
           <div id="loginMsg" class="msg error hidden"></div>
@@ -367,7 +316,7 @@
           <div class="field">
             <label>Email</label>
             <div class="control">
-              <span class="icon">📧</span>
+              <span>📧</span>
               <input id="email" type="email" placeholder="admin@..." autocomplete="username" />
             </div>
           </div>
@@ -375,30 +324,25 @@
           <div class="field">
             <label>Password</label>
             <div class="control">
-              <span class="icon">🔑</span>
+              <span>🔑</span>
               <input id="password" type="password" placeholder="••••••••" autocomplete="current-password" />
-              <button class="iconbtn" id="btnTogglePass" type="button" title="Lihat/Sembunyikan">👁️</button>
+              <button class="iconbtn" id="btnTogglePass" type="button">👁️</button>
             </div>
           </div>
 
           <button class="btn primary" id="btnLogin" type="button">Masuk</button>
 
           <p class="hint">
-            Kalau email/password salah → muncul alert + pesan error.
             Pastikan user admin sudah dibuat di <b>Supabase → Auth → Users</b>.
           </p>
         </div>
       </div>
     </div>
-
   </div>
 
   <!-- DASHBOARD -->
   <div class="panel hidden" id="dashPanel">
-    <h2>
-      Dashboard
-      <span class="mini" id="whoamiMini">👤 -</span>
-    </h2>
+    <h2>Dashboard <span class="mini" id="whoamiMini">👤 -</span></h2>
 
     <div class="body">
       <div id="dashMsg" class="msg ok hidden"></div>
@@ -406,65 +350,52 @@
 
       <div class="hr"></div>
 
-      <!-- GANTI PASSWORD -->
       <div class="row">
         <b style="font-size:14px">Ganti Password</b>
 
         <div class="field">
           <label>Password baru</label>
           <div class="control">
-            <span class="icon">🆕</span>
+            <span>🆕</span>
             <input id="newPass" type="password" placeholder="minimal 6 karakter" autocomplete="new-password" />
-            <button class="iconbtn" id="btnToggleNewPass" type="button" title="Lihat/Sembunyikan">👁️</button>
+            <button class="iconbtn" id="btnToggleNewPass" type="button">👁️</button>
           </div>
         </div>
 
         <div class="field">
           <label>Ulangi password baru</label>
           <div class="control">
-            <span class="icon">✅</span>
+            <span>✅</span>
             <input id="newPass2" type="password" placeholder="ulangin lagi" autocomplete="new-password" />
           </div>
         </div>
 
         <button class="btn primary" id="btnChangePass" type="button">Simpan Password</button>
-
-        <p class="hint">
-          Ini beneran ganti password akun Supabase.
-        </p>
       </div>
 
       <div class="hr"></div>
 
-      <!-- LIST PDF -->
-      <b style="font-size:14px">Daftar PDF (dari ../data/pdfs.json)</b>
+      <b style="font-size:14px">Daftar PDF</b>
       <div class="list" id="list" style="margin-top:10px">Loading…</div>
-
-      <p class="hint" style="margin-top:10px">
-        Catatan: GitHub Pages tidak bisa “save ke repo” langsung dari browser.
-        Workflow upload ke repo tetap manual.
-      </p>
     </div>
   </div>
 
 </div>
 
-<!-- TOAST -->
 <div class="toast" id="toast"></div>
 
 <script>
-  /* =========================
-     KONFIG SUPABASE (ISI INI)
-     ========================= */
+  /* ============ SUPABASE CONFIG ============ */
   const SUPABASE_URL = "https://stvutgjyjftgjjexbrvd.supabase.co";
   const SUPABASE_ANON_KEY = "sb_publishable_zdgWtC2m1YFLW8gDtrL1HA_H99b4BWX";
 
-  /* Optional: batasi hanya email tertentu (multi admin) */
-  const ADMIN_EMAILS = []; 
-  // contoh:
-  // const ADMIN_EMAILS = ["admin1@email.com", "admin2@email.com"];
-  
-  /* DOM */
+  /* ✅ FIX WAJIB: bikin client Supabase */
+  const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+  /* Kalau mau multi admin, isi email di sini */
+  const ADMIN_EMAILS = [];
+  // contoh: const ADMIN_EMAILS = ["admin1@gmail.com", "admin2@gmail.com"];
+
   const loginPanel = document.getElementById("loginPanel");
   const dashPanel  = document.getElementById("dashPanel");
   const btnLogout  = document.getElementById("btnLogout");
@@ -491,6 +422,12 @@
   function show(el){ el.classList.remove("hidden"); }
   function hide(el){ el.classList.add("hidden"); }
 
+  function escapeHtml(str=""){
+    return String(str).replace(/[&<>"']/g, m => ({
+      "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"
+    }[m]));
+  }
+
   function toast(title, desc=""){
     const t = document.createElement("div");
     t.className = "t";
@@ -502,7 +439,7 @@
       </div>
     `;
     toastEl.appendChild(t);
-    setTimeout(()=>{ t.remove(); }, 2600);
+    setTimeout(()=>t.remove(), 2600);
   }
 
   function showLoginError(text){
@@ -513,22 +450,17 @@
     hide(loginMsg);
     loginMsg.textContent = "";
   }
-  function toastOkInDash(text){
-    dashMsg.textContent = text;
-    show(dashMsg);
-    setTimeout(()=>hide(dashMsg), 2500);
-  }
-
-  function escapeHtml(str=""){
-    return String(str).replace(/[&<>"']/g, m => ({
-      "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"
-    }[m]));
-  }
 
   function isAllowedEmail(userEmail){
     if (!ADMIN_EMAILS.length) return true;
     const u = (userEmail || "").toLowerCase();
     return ADMIN_EMAILS.map(e => String(e).toLowerCase()).includes(u);
+  }
+
+  function setLoading(btn, loading){
+    btn.disabled = loading;
+    btn.dataset._txt = btn.dataset._txt || btn.textContent;
+    btn.textContent = loading ? "Loading…" : btn.dataset._txt;
   }
 
   async function loadList(){
@@ -550,96 +482,63 @@
 
         const left = document.createElement("div");
         left.className = "meta";
-        left.innerHTML = `
-          <b>${escapeHtml(it.title || "Tanpa judul")}</b>
-          <small>${escapeHtml(it.url || "")}</small>
-        `;
+        left.innerHTML = `<b>${escapeHtml(it.title || "Tanpa judul")}</b><small>${escapeHtml(it.url || "")}</small>`;
 
         const open = document.createElement("a");
         open.className = "btn";
         open.target = "_blank";
         open.rel = "noopener";
-
-        if (it.url){
-          open.href = it.url.startsWith("http") ? it.url : "../" + it.url;
-          open.textContent = "Buka";
-        } else {
-          open.href = "#";
-          open.textContent = "Buka";
-          open.style.opacity = ".5";
-          open.style.pointerEvents = "none";
-        }
+        open.href = it.url?.startsWith("http") ? it.url : "../" + (it.url || "");
+        open.textContent = "Buka";
 
         row.appendChild(left);
         row.appendChild(open);
         listEl.appendChild(row);
       });
-    } catch (e){
+    }catch(e){
       console.error(e);
       listEl.innerHTML = "<div class='msg error'>Gagal memuat ../data/pdfs.json</div>";
     }
   }
 
-  async function setUIForSession(){
+  async function setUI(){
     const { data: { session } } = await supabase.auth.getSession();
-
     if (!session){
-      show(loginPanel);
-      hide(dashPanel);
-      hide(btnLogout);
+      show(loginPanel); hide(dashPanel); hide(btnLogout);
       return;
     }
 
-    const userEmail = session.user?.email || "";
-
-    if (!isAllowedEmail(userEmail)){
+    const email = session.user?.email || "";
+    if (!isAllowedEmail(email)){
       await supabase.auth.signOut();
-      alert("Akun ini bukan admin.");
-      toast("Ditolak", "Akun ini bukan admin.");
-      show(loginPanel);
-      hide(dashPanel);
-      hide(btnLogout);
+      alert("Akun ini bukan admin");
+      show(loginPanel); hide(dashPanel); hide(btnLogout);
       return;
     }
 
-    hide(loginPanel);
-    show(dashPanel);
-    show(btnLogout);
-
-    whoami.textContent = "Login sebagai: " + userEmail;
-    whoamiMini.textContent = "👤 " + userEmail;
+    hide(loginPanel); show(dashPanel); show(btnLogout);
+    whoami.textContent = "Login sebagai: " + email;
+    whoamiMini.textContent = "👤 " + email;
 
     loadList();
   }
 
-  function setLoading(btn, loading){
-    if (!btn) return;
-    btn.disabled = loading;
-    btn.dataset._txt = btn.dataset._txt || btn.textContent;
-    btn.textContent = loading ? "Loading…" : btn.dataset._txt;
-  }
+  btnTogglePass.onclick = () => {
+    passEl.type = passEl.type === "password" ? "text" : "password";
+    btnTogglePass.textContent = passEl.type === "password" ? "👁️" : "🙈";
+  };
+  btnToggleNewPass.onclick = () => {
+    newPassEl.type = newPassEl.type === "password" ? "text" : "password";
+    btnToggleNewPass.textContent = newPassEl.type === "password" ? "👁️" : "🙈";
+  };
 
-  btnTogglePass.addEventListener("click", ()=>{
-    const isPass = passEl.type === "password";
-    passEl.type = isPass ? "text" : "password";
-    btnTogglePass.textContent = isPass ? "🙈" : "👁️";
-  });
-
-  btnToggleNewPass.addEventListener("click", ()=>{
-    const isPass = newPassEl.type === "password";
-    newPassEl.type = isPass ? "text" : "password";
-    btnToggleNewPass.textContent = isPass ? "🙈" : "👁️";
-  });
-
-  btnLogin.addEventListener("click", async ()=>{
+  btnLogin.onclick = async () => {
     clearLoginError();
-
-    const email = (emailEl.value || "").trim();
-    const password = passEl.value || "";
+    const email = emailEl.value.trim();
+    const password = passEl.value;
 
     if (!email || !password){
-      showLoginError("Email / password masih kosong.");
-      alert("Email / password masih kosong.");
+      showLoginError("Email / password kosong");
       return;
     }
 
@@ -649,72 +548,36 @@
 
     if (error){
       showLoginError("Login gagal: " + error.message);
-      alert("Login gagal: " + error.message);
       toast("Login gagal", error.message);
       return;
     }
 
-    const userEmail = data.user?.email || "";
-    if (!isAllowedEmail(userEmail)){
-      await supabase.auth.signOut();
-      alert("Akun ini bukan admin.");
-      toast("Ditolak", "Akun ini bukan admin.");
-      return;
-    }
+    toast("Login sukses ✅", data.user.email);
+    await setUI();
+  };
 
-    toast("Berhasil", "Login sukses ✅");
-    await setUIForSession();
-  });
-
-  btnLogout.addEventListener("click", async ()=>{
+  btnLogout.onclick = async () => {
     await supabase.auth.signOut();
-    alert("Logout berhasil.");
-    toast("Logout", "Sampai ketemu lagi 👋");
-    await setUIForSession();
-  });
+    toast("Logout", "Berhasil keluar");
+    await setUI();
+  };
 
-  btnChangePass.addEventListener("click", async ()=>{
-    const p1 = newPassEl.value || "";
-    const p2 = newPass2El.value || "";
+  btnChangePass.onclick = async () => {
+    const p1 = newPassEl.value;
+    const p2 = newPass2El.value;
 
-    if (p1.length < 6){
-      alert("Password baru minimal 6 karakter.");
-      toast("Gagal", "Password minimal 6 karakter.");
-      return;
-    }
-    if (p1 !== p2){
-      alert("Ulangi password tidak sama.");
-      toast("Gagal", "Konfirmasi password tidak sama.");
-      return;
-    }
+    if (p1.length < 6) return alert("Minimal 6 karakter");
+    if (p1 !== p2) return alert("Password tidak sama");
 
-    const { data: { session } } = await supabase.auth.getSession();
-    if (!session){
-      alert("Session login hilang. Login ulang ya.");
-      toast("Session hilang", "Login ulang dulu ya.");
-      await setUIForSession();
-      return;
-    }
-
-    setLoading(btnChangePass, true);
     const { error } = await supabase.auth.updateUser({ password: p1 });
-    setLoading(btnChangePass, false);
-
-    if (error){
-      alert("Gagal ganti password: " + error.message);
-      toast("Gagal", error.message);
-      return;
-    }
+    if (error) return alert("Gagal: " + error.message);
 
     newPassEl.value = "";
     newPass2El.value = "";
-    toastOkInDash("Password berhasil diganti ✅");
-    alert("Password berhasil diganti ✅");
-    toast("Sukses", "Password berhasil diganti ✅");
-  });
+    toast("Password diganti ✅", "Berhasil");
+  };
 
-  // Init
-  setUIForSession();
+  setUI();
 </script>
 
 </body>
