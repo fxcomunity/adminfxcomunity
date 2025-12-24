@@ -16,6 +16,9 @@ const toggleThemeBtn = $("#toggleTheme");
 let allItems = [];
 let viewMode = localStorage.getItem("viewMode") || "grid"; // grid | list
 
+/* =========================
+   UTIL
+========================= */
 function escapeHtml(str = "") {
   return String(str).replace(/[&<>"']/g, (m) => ({
     "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#039;",
@@ -62,16 +65,106 @@ function renderCategoryOptions(categories) {
 function toHref(url) {
   if (!url) return "";
   if (/^https?:\/\//i.test(url)) return url;
-  return url.replace(/^\/+/, ""); // relatif dari root
+  return url.replace(/^\/+/, "");
 }
 
+/* =========================
+   SKELETON LOADING (biar ga kerasa lama)
+========================= */
+function renderSkeleton(n = 6) {
+  toggleViewBtn.textContent = viewMode === "grid" ? "⬛⬛" : "☰";
+  const cardStyle = `
+    border-radius:22px;
+    padding:16px;
+    border:1px solid var(--border);
+    background: linear-gradient(180deg, var(--card), var(--card2));
+    box-shadow: 0 18px 55px rgba(0,0,0,.18);
+  `;
+
+  const bar = (w) => `
+    <div style="
+      height:12px;
+      width:${w};
+      border-radius:999px;
+      background: rgba(255,255,255,.10);
+      margin: 8px 0;
+      overflow:hidden;
+      position:relative">
+      <div style="
+        position:absolute; inset:0;
+        background: linear-gradient(90deg,
+          transparent 0%,
+          rgba(255,255,255,.18) 50%,
+          transparent 100%);
+        transform: translateX(-100%);
+        animation: shimmer 1.1s infinite;">
+      </div>
+    </div>
+  `;
+
+  listEl.innerHTML = `
+    <style>
+      @keyframes shimmer{
+        100%{ transform: translateX(100%); }
+      }
+    </style>
+    ${Array.from({ length: n }).map(() => `
+      <div class="card" style="${cardStyle}">
+        ${bar("60%")}
+        ${bar("85%")}
+        <div style="height:280px;border-radius:16px;background:rgba(255,255,255,.06);margin-top:12px"></div>
+        ${bar("35%")}
+      </div>
+    `).join("")}
+  `;
+}
+
+/* =========================
+   CACHE (biar buka ulang ga nunggu)
+========================= */
+const CACHE_KEY = "pdf_cache_v1";
+const CACHE_TTL = 1000 * 60 * 10; // 10 menit
+
+function saveCache(raw) {
+  try {
+    localStorage.setItem(CACHE_KEY, JSON.stringify({
+      t: Date.now(),
+      raw
+    }));
+  } catch {}
+}
+
+function loadCache() {
+  try {
+    const c = JSON.parse(localStorage.getItem(CACHE_KEY) || "null");
+    if (!c) return null;
+    if (Date.now() - c.t > CACHE_TTL) return null;
+    return c.raw;
+  } catch {
+    return null;
+  }
+}
+
+/* =========================
+   FETCH TIMEOUT (biar ga loading selamanya)
+========================= */
+async function fetchWithTimeout(url, ms = 8000) {
+  const ctrl = new AbortController();
+  const t = setTimeout(() => ctrl.abort(), ms);
+  const res = await fetch(url, { signal: ctrl.signal });
+  clearTimeout(t);
+  return res;
+}
+
+/* =========================
+   RENDER
+========================= */
 function render(items) {
   if (!items.length) {
     listEl.innerHTML = "";
     return;
   }
 
-  // ubah ikon tombol view
   toggleViewBtn.textContent = viewMode === "grid" ? "⬛⬛" : "☰";
 
   listEl.innerHTML = items.map((it) => {
@@ -107,6 +200,9 @@ function render(items) {
   }).join("");
 }
 
+/* =========================
+   FILTER
+========================= */
 function applyFilters() {
   const q = (searchEl.value || "").toLowerCase().trim();
   const cat = categoryEl.value || "all";
@@ -126,12 +222,34 @@ function applyFilters() {
   setEmpty(filtered.length === 0);
 }
 
+/* =========================
+   LOAD DATA (lebih cepat)
+========================= */
 async function loadData() {
-  listEl.innerHTML = "Loading…";
+  // ✅ tampilkan skeleton dulu
+  renderSkeleton(6);
+  setCount(0);
+  setEmpty(false);
+
+  // ✅ tampilkan cache dulu kalau ada
+  const cached = loadCache();
+  if (cached) {
+    try {
+      const items = Array.isArray(cached) ? cached : (cached.items || []);
+      allItems = items;
+      updatedAtEl.textContent = Array.isArray(cached) ? "-" : formatDate(cached.updatedAt);
+
+      renderCategoryOptions(getCategories(allItems));
+      applyFilters();
+    } catch {}
+  }
 
   try {
-    const res = await fetch("data/pdfs.json?_=" + Date.now());
+    const res = await fetchWithTimeout("data/pdfs.json?_=" + Date.now(), 8000);
     const raw = await res.json();
+
+    // simpan cache
+    saveCache(raw);
 
     const items = Array.isArray(raw) ? raw : (raw.items || []);
     allItems = items;
@@ -144,14 +262,19 @@ async function loadData() {
     console.error(e);
     listEl.innerHTML = `<div class="empty-card">
       <div class="empty-title">Gagal memuat data</div>
-      <div class="empty-sub">Pastikan file <b>data/pdfs.json</b> ada dan bisa diakses.</div>
+      <div class="empty-sub">
+        Pastikan file <b>data/pdfs.json</b> ada dan bisa diakses.
+        <br/>Jika GitHub lambat, coba refresh atau pakai Ctrl+Shift+R.
+      </div>
     </div>`;
     setCount(0);
     setEmpty(true);
   }
 }
 
-/* ---------- THEME (ini yang bikin mode malam/pagi beneran jalan) ---------- */
+/* =========================
+   THEME
+========================= */
 function getTheme() {
   return localStorage.getItem("theme") || "dark";
 }
@@ -159,8 +282,6 @@ function getTheme() {
 function setTheme(theme) {
   document.documentElement.setAttribute("data-theme", theme);
   localStorage.setItem("theme", theme);
-
-  // ikon tombol ikut berubah
   if (toggleThemeBtn) toggleThemeBtn.textContent = theme === "dark" ? "🌙" : "☀️";
 }
 
@@ -169,21 +290,23 @@ function toggleTheme() {
   setTheme(next);
 }
 
-/* ---------- VIEW ---------- */
+/* =========================
+   VIEW
+========================= */
 function toggleView() {
   viewMode = viewMode === "grid" ? "list" : "grid";
   localStorage.setItem("viewMode", viewMode);
   applyFilters();
 }
 
-/* ---------- INIT ---------- */
+/* =========================
+   INIT
+========================= */
 yearEl.textContent = String(new Date().getFullYear());
-
 setTheme(getTheme());
 
 toggleThemeBtn?.addEventListener("click", toggleTheme);
 toggleViewBtn?.addEventListener("click", toggleView);
-
 searchEl?.addEventListener("input", applyFilters);
 categoryEl?.addEventListener("change", applyFilters);
 
